@@ -1,0 +1,134 @@
+﻿<Window x:Class="Windows.LocoIoProg"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:wfi="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration" 
+    xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms" 
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    Name="LocoIoWindow" Title="LocoIO Programmer" Height="448" Width="526" Background="#FFF0F0F0" 
+    WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow" ShowInTaskbar="false" ResizeMode="NoResize">
+    <Grid>
+
+        <TabControl Name="TabStrip" Margin="12">
+            <TabItem Header="Port Config" Name="TabPortConfig">
+                <Grid>
+                    
+                    <ListView Margin="8,50,0,43" Name="ListViewPortConfigs" HorizontalAlignment="Left" Width="200" Foreground="Black" ItemsSource="{Binding LvPortConfigs}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Width="35" Header="Port" DisplayMemberBinding="{Binding Port}">
+                                    <GridViewColumn.HeaderContainerStyle>
+                                        <Style TargetType="{x:Type GridViewColumnHeader}">
+                                            <Style.Setters>
+                                                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                                <Setter Property="Padding" Value="5,0,5,0" />
+                                            </Style.Setters>
+                                        </Style>                                        
+                                    </GridViewColumn.HeaderContainerStyle>
+                                </GridViewColumn>                               
+                                <GridViewColumn Width="160" Header="Configuration" DisplayMemberBinding="{Binding Config}">
+                                    <GridViewColumn.HeaderContainerStyle>
+                                        <Style TargetType="{x:Type GridViewColumnHeader}">
+                                            <Style.Setters>
+                                                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                                                <Setter Property="Padding" Value="5,0,5,0" />
+                                            </Style.Setters>
+                                        </Style>
+                                    </GridViewColumn.HeaderContainerStyle>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    
+                    <wfi:WindowsFormsHost Margin="220,50,8,43">
+                        <wf:PropertyGrid x:Name="PropertyGrid" ToolbarVisible="False" PropertySort="NoSort" />
+                    </wfi:WindowsFormsHost>
+                    
+                    <Button Height="23" HorizontalAlignment="Right" Margin="0,0,89,8" Name="CmdRequestConfig" VerticalAlignment="Bottom" Width="75">Read</Button>
+                    <Button Height="23" HorizontalAlignment="Right" Margin="0,0,8,8" Name="CmdWriteConfig" VerticalAlignment="Bottom" Width="75">Write</Button>
+                    
+                </Grid>
+            </TabItem>
+            <TabItem Header="Multiport" Name="TabMultiport">
+                <Grid>
+                    
+                    <Line X1="30" Y1="70" X2="455" Y2="70" Stroke="Gray" StrokeThickness="1"/>
+                    <TextBlock Margin="40,80,0,0" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Width="405" Height="36">
+                        All LocoIO ports must first be configured for multiport mode. After performing this configuration the LocoIO must be power cycled before use. 
+                    </TextBlock>
+                    <Button Margin="305,130,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="140" Height="23" Name="CmdConfigMultiport">Configure for multiport</Button>
+
+                    <Line X1="30" Y1="180" X2="455" Y2="180" Stroke="Gray" StrokeThickness="1"/>
+                    <TextBlock Margin="40,190,0,0" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" Height="20">
+                        Port states. (checked ports are high)
+                    </TextBlock>
+
+                    <TextBlock Margin="115,228,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">1</TextBlock>
+                    <CheckBox Margin="130,230,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkPortState1" />
+                    <CheckBox Margin="155,230,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkPortState2" />
+                    <CheckBox Margin="180,230,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkPortState3" />
+                    <CheckBox Margin="205,230,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkPortState4" />
+
+                    <CheckBox Margin="265,230,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkPortState5" />
+                    <CheckBox Margin="290,230,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkPortState6" />
+                    <CheckBox Margin="315,230,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkPortState7" />
+                    <CheckBox Margin="340,230,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkPortState8" />
+                    <TextBlock Margin="363,228,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">8</TextBlock>
+
+                    <TextBlock Margin="115,263,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">9</TextBlock>
+                    <CheckBox Margin="130,265,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkPortState9" />
+                    <CheckBox Margin="155,265,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkPortState10" />
+                    <CheckBox Margin="180,265,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkPortState11" />
+                    <CheckBox Margin="205,265,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkPortState12" />
+
+                    <CheckBox Margin="265,265,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkPortState13" />
+                    <CheckBox Margin="290,265,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkPortState14" />
+                    <CheckBox Margin="315,265,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkPortState15" />
+                    <CheckBox Margin="340,265,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkPortState16" />
+                    <TextBlock Margin="360,263,0,0" VerticalAlignment="Top" HorizontalAlignment="Left">16</TextBlock>
+
+                    <Button Margin="40,310,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="75" Height="23" Name="CmdClearAll">Clear All</Button>
+                    <Button Margin="121,310,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="75" Height="23" Name="CmdSelectAll">Select All</Button>
+                    <Button Margin="289,310,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="75" Height="23" Name="CmdRequestStates">Read</Button>
+                    <Button Margin="370,310,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="75" Height="23" Name="CmdWriteStates">Write</Button>
+                    
+                </Grid>
+            </TabItem>
+            <TabItem Header="Setup" Name="TabSetup">
+                <Grid>
+                    
+                    <Line X1="30" Y1="70" X2="455" Y2="70" Stroke="Gray" StrokeThickness="1"/>
+                    <TextBlock Margin="40,80,0,0" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Top" Width="320" Height="66">
+                        Broadcasting the above address will change the device address of all LocoIOs connected to Loconet.
+                        Only the LocoIO unit who's address you wish to change should be connected to the Loconet before pressing this button.
+                    </TextBlock>
+                    <Button Margin="370,102,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="75" Height="23" Name="CmdBroadcast">Broadcast</Button>
+
+                    <Line X1="30" Y1="180" X2="455" Y2="180" Stroke="Gray" StrokeThickness="1"/>
+                    <TextBlock Margin="40,190,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Name="Version">
+                        Firmware version: ?
+                    </TextBlock>
+                    <CheckBox Margin="40,220,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkAltPushButtons">Use alternated push buttons</CheckBox>
+                    <CheckBox Margin="40,245,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Name="ChkServoMotorOutputs">Use ports 5 through 12 as servo motor outputs</CheckBox>
+                    <TextBlock Margin="40,275,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        Blinking rate
+                    </TextBlock>
+                    <TextBox Margin="113,272,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="40" Height="23" Name="BlinkingRate" Text="0" />
+                    <Button Margin="289,310,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="75" Height="23" Name="CmdRequestSetup">Read</Button>
+                    <Button Margin="370,310,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="75" Height="23" Name="CmdWriteSetup">Write</Button>
+                    
+                </Grid>
+            </TabItem>
+        </TabControl>
+        
+        <TextBlock Margin="57,55,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+            LocoIO device address
+        </TextBlock>
+        <TextBox Margin="183,52,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="40" Height="23" Name="DeviceAdr" Text="81" />
+        <TextBlock Margin="230,55,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+            and sub-address
+        </TextBlock>
+        <TextBox Margin="325,52,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="40" Height="23" Name="DeviceSubAdr" Text="1" />
+        
+    </Grid>
+</Window>
+

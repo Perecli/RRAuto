@@ -1,0 +1,7 @@
+﻿'These single line steps are not awaited by the caller because they don't return Task objects.
+
+'PostMsg() is not awaitable because it does not return a Task.
+o.Step("StepName1", Sub() PostMsg("Executing"))
+
+'Delay() returns a Task but since this step uses a Sub() no Task is returned.
+o.Step("StepName2", Sub() Delay(1000))

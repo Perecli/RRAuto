@@ -1,0 +1,19 @@
+Public Class MyClassName
+
+	Public Property MyPropName1() as Object
+
+	Public Property MyPropName2() as Object
+
+	'Add other properties
+
+	Public Sub MySubName()
+		'Enter code here
+	End Sub
+
+	Public Function MyFuncName() as Object
+		'Enter code here
+	End Function
+
+	'Add other methods
+
+End Class

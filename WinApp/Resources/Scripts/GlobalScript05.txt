@@ -1,0 +1,3 @@
+Public Async Function MyFuncNameAsync() as Task
+	'Enter code here
+End Function

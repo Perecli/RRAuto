@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="" GeneratedClassName="MySettings" UseMySettingsClassName="true">
+  <Profiles />
+  <Settings>
+    <Setting Name="ComPort" Type="System.Byte" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="BaudRate" Type="RRAutoLib.Loconet.BaudRate" Scope="User">
+      <Value Profile="(Default)">_57600</Value>
+    </Setting>
+    <Setting Name="FlowControl" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="LoadLastFile" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="LastFileUsed" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LastModeUsed" Type="RRAuto.AppMode" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="SpeechService" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="VoiceFeedback" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="LoconetShowStamp" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="LoconetShowSource" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="LoconetShowDesc" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="LoconetShowParm" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="LoconetShowOpCode" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="LoconetShowHex" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="LoconetShowID" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ListMaxLines" Type="System.UInt16" Scope="User">
+      <Value Profile="(Default)">500</Value>
+    </Setting>
+    <Setting Name="DefaultZoomLevel" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="ZoomIncrement" Type="System.Byte" Scope="User">
+      <Value Profile="(Default)">20</Value>
+    </Setting>
+    <Setting Name="BackColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FF2F4F4F</Value>
+    </Setting>
+    <Setting Name="GridColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FF008B8B</Value>
+    </Setting>
+    <Setting Name="TurnoutLockedColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFFF0000</Value>
+    </Setting>
+    <Setting Name="TurnoutPendingColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFFFFF00</Value>
+    </Setting>
+    <Setting Name="TurnoutSetColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFFF8000</Value>
+    </Setting>
+    <Setting Name="FreeBlockColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFA0A0A0</Value>
+    </Setting>
+    <Setting Name="ResBlockColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFEEE8AA</Value>
+    </Setting>
+    <Setting Name="ResOccBlockColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFFFD700</Value>
+    </Setting>
+    <Setting Name="OccBlockColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFF08080</Value>
+    </Setting>
+    <Setting Name="SelectionColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFFFFFFF</Value>
+    </Setting>
+    <Setting Name="RecentDocuments" Type="System.Collections.ArrayList" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="SimulationMode" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="CtcEventsShowNative" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="CtcEventsShowUser" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="EnableRemServ" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="RemServPort" Type="System.UInt16" Scope="User">
+      <Value Profile="(Default)">8080</Value>
+    </Setting>
+    <Setting Name="TrackNoBlockColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFF08080</Value>
+    </Setting>
+    <Setting Name="ForceSetState" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="BroadcastStates" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="QuerySensors" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ClearCtcEvents" Type="System.String" Scope="User">
+      <Value Profile="(Default)">false</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

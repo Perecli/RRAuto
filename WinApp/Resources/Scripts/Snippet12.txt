@@ -1,0 +1,6 @@
+PostMsg("Script started.")
+
+'Waits for 3000ms (3sec) before continuing to the next line
+Await Delay(3000)
+
+PostMsg("Script ended after a 3 second delay.")

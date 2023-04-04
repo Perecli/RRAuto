@@ -1,0 +1,58 @@
+﻿/* container for elements stacked horizontal  */
+.FlexContHoriz {	
+	display: -ms-flexbox;
+	display: -webkit-flexbox;
+	display: flex;
+				
+	-ms-flex-direction: row;
+	-webkit-flex-direction: row;
+	flex-direction: row;								
+}
+
+/* container for elements stacked vertical */
+.FlexContVert {			
+	display: -ms-flexbox;
+	display: -webkit-flexbox;
+	display: flex;
+				
+	-ms-flex-direction: column;
+	-webkit-flex-direction: column;
+	flex-direction: column;								
+}
+
+.FlexContAlignCC {	
+	display: -ms-flexbox;
+	display: -webkit-flexbox;
+	display: flex;
+
+    -ms-flex-align: center;
+    -webkit-align-items: center;		
+    align-items: center;
+    	
+    -ms-flex-pack: center;	
+    -webkit-justify-content: center;
+    justify-content: center; 				
+}
+		
+/* fills remaining space left by other FlexItemDef items 
+   if more than one FlexItemAuto defined in a container, the size is divided evenly among them */
+.FlexItemAuto { 			
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
+
+    /* hack for Chrome bug which doesn't respect flex item sizing and instead uses content for sizing;
+       this makes it work like other browsers that don't need this;
+       submitted the bug (https://bugs.chromium.org/p/chromium/issues/detail?id=606186) and was promissed a fix in Chrome v51 */
+    flex-basis: 0;
+
+    /* explicitly allows flexbox items to be smaller than the size of their content (allowing their content to scroll);
+       the flexbox spec was changed to default 'min-width/height' to 'auto'; setting them to 0 reverts back to the original behavior */
+    min-height: 0;
+    min-width: 0;
+
+    /* flex items like this, with large content, should shrink to 0 not affecting their siblings unless they also are flex items;
+       a Chrome bug was introduced that shrinks all siblings of a flexbox container, collapsing content of items not marked as flex;
+       this hack forces this flex item to infinitely (almost) shrink in proportion to its siblings preventing them from collapsing  */
+    flex-shrink: 1000000;
+}

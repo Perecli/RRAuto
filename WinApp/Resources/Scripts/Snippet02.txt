@@ -1,0 +1,6 @@
+'Check the state of the sensor
+If CtcSensor("SensorName").State = 1 Then
+	'Do stuff when sensor is On
+Else
+	'Do stuff when sensor is Off
+End If

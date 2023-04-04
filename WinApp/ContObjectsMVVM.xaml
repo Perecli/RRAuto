@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="CustomControls.ContObjectsMVVM"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:local="clr-namespace:RRAuto.CustomControls"              
+    mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300">
+
+    <local:TreeViewX x:Name="TV" ItemsSource="{Binding Root}" TreeViewItem.Selected="TreeViewItemSelected" NodeDoubleClick="OnNodeDoubleClick" 
+                     VirtualizingStackPanel.IsVirtualizing="false" VirtualizingStackPanel.VirtualizationMode="Recycling">
+                    <!-- the virtualizing attributes are here for reference since they are set to defaults; 
+                         these optimize node creation for large node counts but expose a framework bug where setting IsSelected on a node thats out of view is ignored -->
+        
+        <TreeView.ItemContainerStyle>            
+            <Style TargetType="{x:Type TreeViewItem}">
+                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                <Setter Property="Template" Value="{StaticResource TreeViewItemTemplate}" />                        
+            </Style>
+        </TreeView.ItemContainerStyle>
+
+        <TreeView.Resources>
+            <local:TreeViewItemSortConverter x:Key="SortConverter"/>
+
+            <HierarchicalDataTemplate DataType="{x:Type local:CtcListViewModel}" ItemsSource="{Binding Children, Converter={StaticResource SortConverter}, ConverterParameter='Name'}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="16" Height="16" Margin="0,0,4,0" Source="{Binding Icon}" />
+                    <TextBlock Text="{Binding Name}" />
+                </StackPanel>
+            </HierarchicalDataTemplate>
+
+            <HierarchicalDataTemplate DataType="{x:Type local:CtcObjViewModel}" ItemsSource="{Binding Children}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="16" Height="16" Margin="0,0,4,0" Source="{Binding Icon}" />
+                    <TextBlock Text="{Binding Name}" />
+                </StackPanel>
+            </HierarchicalDataTemplate>
+
+            <HierarchicalDataTemplate DataType="{x:Type local:StateViewModel}" ItemsSource="{Binding Children}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="16" Height="16" Margin="0,0,4,0" Source="{Binding Icon}" />
+                    <TextBlock Text="{Binding Name}" />
+                </StackPanel>
+            </HierarchicalDataTemplate>
+
+            <DataTemplate DataType="{x:Type local:PacketViewModel}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Width="16" Height="16" Margin="0,0,4,0" Source="{Binding Icon}" />
+                    <TextBlock Text="{Binding Name}" />
+                </StackPanel>
+            </DataTemplate>
+        </TreeView.Resources>
+
+    </local:TreeViewX>
+
+</UserControl>
+

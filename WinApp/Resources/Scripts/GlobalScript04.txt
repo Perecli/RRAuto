@@ -1,0 +1,4 @@
+<Runtime.CompilerServices.Extension()>
+Public Function MyFuncName(obj as TypeBeingExtended) as Object
+	'Enter code here
+End Function

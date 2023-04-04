@@ -1,0 +1,2 @@
+﻿'Plays a sound file asynchronously from a given directory at half volume
+PlaySound("C:\Users\Perry\Documents\Sounds\MySound.wav", 0.5)

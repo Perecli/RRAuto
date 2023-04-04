@@ -1,0 +1,5 @@
+﻿'Gets automatically executed when entering operation mode.
+'Use "Public Async Sub OnCtcStart()" if sub contains any Awaits.
+Public Sub OnCtcStart()
+	'Enter code here
+End Sub

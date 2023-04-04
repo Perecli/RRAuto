@@ -1,0 +1,16 @@
+'Get a route reference since we will be using it multiple times
+Dim objRoute as Route = CtcRoute("RouteName")
+
+'Lock the route, wait for it to complete, and act on the result
+If Await objRoute.Lock Then 
+	'Do stuff if setting the route succeeded
+Else
+	'Do stuff if setting the route failed
+End If 
+	
+'Same as above, except here we don't care about the result
+Await objRoute.Lock
+
+'Same as above, except here we don't even care to wait for
+'it to complete before executing the next script line
+objRoute.Lock

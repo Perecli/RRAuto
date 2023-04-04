@@ -1,0 +1,41 @@
+'This is a custom Loconet packet class template
+Public Class PkCustom 
+	Inherits PkUnknown 
+
+	Public Sub New() 
+		'Initialize a packet with n bytes
+		_bytaBytes = New Byte([n-1]) {[byte1],[byte2], ...,[byte n]} 
+	End Sub 
+
+	Public Property MyParameter() As [Type] 
+		Get 
+			'Decode parameter from _bytaBytes() bytes 
+		End Get 
+		Set(Value As [Type]) 
+			'Encode parameter to _bytaBytes() bytes 
+		End Set 
+	End Property 
+
+	Public Overrides ReadOnly Property NeedsPacketResponse() As Boolean 
+		Get 
+			Return MyBase.NeedsPacketResponse
+		End Get 
+	End Property 
+
+	Public Overrides Function ValidPacketResponse(objResponsePacket As RRAutoLib.Loconet.Packet) As Boolean 
+		Return MyBase.ValidPacketResponse(objResponsePacket)
+	End Function 
+
+	Public Overrides ReadOnly Property Description() As String 
+		Get 
+			Return "My custom packet" 
+		End Get 
+	End Property 
+
+	Public Overrides ReadOnly Property ParmsDesc() As String 
+		Get 
+			Return "MyParm=" & Me.MyParameter 
+		End Get 
+	End Property 
+
+End Class

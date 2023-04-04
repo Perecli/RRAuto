@@ -1,0 +1,9 @@
+﻿PostMsg("Starting count down")
+
+Await Delay(1000)
+For intCnt as Integer = 10 to 1 step -1
+	PostMsg(intCnt)
+	Await Delay(1000)
+Next
+
+PostMsg("Blast off")

@@ -1,0 +1,11 @@
+'Sets a label in the switchboard to display the reported transponder's locomotive address 
+'The assumption here is that a sensor's event was bound to this script object
+
+'Check that the packet that triggered this sensor is one capable of reporting 
+'transponder information
+If Typeof e.Args Is PkMultiSense Then
+	'The Loconet packet that triggered the sensor is always returned through e.Args
+	Dim objPacket as PkMultiSense = e.Args
+
+	CtcLabel("LabelName").DynamicText = objPacket.DccAddress
+End If

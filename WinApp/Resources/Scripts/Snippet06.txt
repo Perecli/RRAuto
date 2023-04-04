@@ -1,0 +1,18 @@
+'Get a signal reference since we will be using it multiple times
+Dim objSignal as Signal = CtcSignal("SignalName")
+
+'Optionally you can act based on the signals's aspect configuration
+'See documentation of all types defined by the Signal.SignalConfig enumeration
+If objSignal.Config = Signal.SignalConfig.StopClearCautionShunt
+
+	'Check the aspect of the signal
+	Select Case objSignal.Aspect.Name
+		Case "Stop"
+			'Do stuff when signal in showing Stop
+		Case "Clear", "Caution"
+			'Do stuff when signal in showing Clear or Caution
+		Case Else
+			'Do stuff for all other aspects
+	End Select
+
+End If

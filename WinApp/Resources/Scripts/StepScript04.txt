@@ -1,0 +1,18 @@
+﻿'These multi-line steps are awaited by the caller because they return a Task.
+
+'The "Async" key word wraps the entire step into a Task and returns it.
+'The "Async" declaration is required if any of the containing methods are Awaited.
+o.Step("StepName1", Async Function()
+	Await Delay(1000)
+	PostMsg("Executing 1")
+	Await Delay(1000)
+	PostMsg("Executing 2")
+End Function)
+
+'No "Async" is needed here because the only awaitable method is at the end
+'so that task can be returned directly. Note that this is allowed because 
+'no containing methods are Awaited. The Await is yielded to the caller.
+o.Step("StepName2", Function()
+	PostMsg("Executing")
+	Return Delay(1000)
+End Function)

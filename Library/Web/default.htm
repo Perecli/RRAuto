@@ -1,0 +1,1082 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="utf-8" />
+        <title>RRA Remote Throttle</title>
+
+        <meta http-equiv="pragma" content="no-cache" />
+        <meta http-equiv="cache-control" content="max-age=0" />
+        <meta http-equiv="cache-control" content="no-cache" />
+        <meta http-equiv="cache-control" content="no-store" />
+        <meta http-equiv="expires" content="0" />
+
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        
+        <!--favicon and app metadata (some of it generated with help from https://realfavicongenerator.net)--> 
+        <!--general standards-->
+        <meta name="application-name" content="RRA Client" />  
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=6" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=6" />
+        <link rel="shortcut icon" href="/favicon.ico?v=6" />        
+        <!--Apple specific-->
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />        
+        <meta name="apple-mobile-web-app-title" content="RRA Client" />   
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=6" />
+        <link rel="mask-icon" href="/safari-pinned-tab.svg?v=6" color="#B47D00" />           
+        <!--Chrome on Android specific-->
+        <meta name="theme-color" content="#ffffff" />
+        <link rel="manifest" href="/manifest.json?v=8" />        
+        <!--Windows specific-->
+        <meta name="msapplication-config" content="/browserconfig.xml?v=6" />
+        
+        <link rel="stylesheet" href="base.css" />        
+        <link rel="stylesheet" href="flexbox.css" />
+        <link rel="stylesheet" href="throttle.css" />
+
+        <style>
+            /* note: width not the same a screen resolution width (one CSS pixel can contain several actual resolution pixels) */
+            @media screen and (min-width:0px) and (max-width:500px) { /* for smaller screens */
+                .Throttle {
+	                flex: 1;
+                    width: unset;
+                }
+                #ThrottleDiv {
+                    display: none;
+                }
+            }
+            @media screen and (min-width:500px) { /* for larger screens */
+                .Throttle  {
+	                flex: none;
+                    width: 235px;
+                }
+                #ThrottleDiv {
+                    display: block;
+                }
+            }
+        </style>
+                
+        <script src="jquery-3.3.1.min.js"></script>
+        <script src="jquery.signalR-2.2.3.min.js"></script>
+        <script src="signalr/hubs"></script>
+        <script src="jquery-cookie.js"></script>
+        <script src="jquery.pep-0.4.3.js"></script>
+        <script src="jquery.pep.gestures.js"></script>   
+        <script src="throttle.js"></script>
+        <script src="utilities.js"></script>
+
+        <script>
+            // get rid of properties; make all functions a la jQuery
+
+            // known issues:
+            // on Firefox all kinds of touch issues that stem from the long hold
+            // - on speed slider if you touch and hold before moving no moving occurs
+            // - on ramp if you hold for longer it never cancels when untouched
+            // on IE its a lost cause for rendering (gave up; no one should be using it)
+            // on Edge several problems but won't deal with them until browser stabilises
+
+            // jquery selector cache
+            var sc = new util.selCache();
+
+            // initialize static throttle members
+            $.cookie.json = true;
+            Throttle.settings = $.cookie('throtSettings');  // load settings from cookie
+            if (!Throttle.settings) {
+                // set defaults if not found in cookie
+                Throttle.settings = {
+                    clientNameDef: util.randHexStr(2),  // this client name used if clientNameGiven is ''
+                    clientNameGiven: '',                // this client name used if not '' 
+                    spdSliderRatio: 1,                  // ratio x:1; drag units per speed units
+                    spdRampTimeInt: 300,                // ramp time interval (how often the speed is refreshed)
+                    spdRampMaxStep: 6,                  // maximum speed steps per time interval (min is 1)
+                    spdFormat: '%',                     // '%':Percent; '#':Actual speed number
+                    enableSpdSound: false,
+                    spdSoundFile: 'tic1.wav',
+                    releaseSpdTo0: false,               // speed should be set to 0 when releasing control
+                    engPickSort: 'N'                    // 'N':Engine Name; 'A':DCC address
+                };
+                // save settings in cookie
+                $.cookie('throtSettings', Throttle.settings, { expires: 365 });  // 1 year
+            };
+            Throttle.stateChanged = function (changeScope, throt) {
+                if (changeScope == 'Spd') {                    
+                    // optimized speed change events: consolidated a potential flood of render calls to a single render call per animation frame
+                    // this main problem got fixed for the most part by switching from div to input element to display speed number; now only helps Firefox just slightly 
+                    if (!throt.spdRendSubmitted) {
+                        throt.spdRendSubmitted = true;  // only allow single submission to requestAnimationFrame() per frame 
+                        window.requestAnimationFrame(function () {
+                            renderThrottle(changeScope, throt);
+                            throt.spdRendSubmitted = false; // make ready for next render submission
+                        });
+                    }
+                } else {
+                    // no optimization needed for everything else
+                    renderThrottle(changeScope, throt);
+                }
+            };
+            Throttle.errorOccured = function (msg) {
+                showMessage('throttle', msg, true);
+            };                       
+            
+            // look into "Web audio API" when widely supported because the current javascript built-in sound engine sucks
+            var speedTic = new Audio(Throttle.settings.spdSoundFile);
+                 
+            $(function () {                               
+                                
+                // initialize throttle instances
+                var throttles = [new Throttle(0), new Throttle(1)];
+
+                var engineProxy = $.connection.EngineHub;
+
+                // these must be defined before hub.start because server hub is not called unless at least one clinet event handler exists
+                // server events are per hub not per throttle so these delegate the hub events to each individual throttle instance
+                engineProxy.client.SpeedChanged = function (engineID, speed, throtID) {
+                    $.each(throttles, function (index, throt) {
+                        if (throt.engineID == engineID) throt.onSpeedChanged(speed, throtID);
+                    });
+                };
+                engineProxy.client.DirectionChanged = function (engineID, direction) {
+                    $.each(throttles, function (index, throt) {
+                        if (throt.engineID == engineID) throt.onDirChanged(direction);
+                    });
+                };
+                engineProxy.client.FunctionsChanged = function (engineID, functions) {
+                    $.each(throttles, function (index, throt) {
+                        if (throt.engineID == engineID) throt.onFuncChanged(functions);
+                    });
+                };
+                // method for server to be able to remotely close the connection
+                engineProxy.client.stop = function () {
+                    $.connection.hub.stop();
+                };
+                                                            
+                // friendly client name passed through querystring
+                var clientName = (Throttle.settings.clientNameGiven == '') ? Throttle.settings.clientNameDef : Throttle.settings.clientNameGiven;
+                $.connection.hub.qs = { 'cname': clientName };
+                $('#ClientName').html(clientName);
+
+                // bind hub connection events
+                $.connection.hub
+                    .connectionSlow(function () {
+                        showMessage('connection', 'Connection is having problems. Possible slow connection.', true, 3000);
+                    })
+                    .reconnecting(function () {
+                        showMessage('connection', 'Attempting to reconnect.', false);
+                    })
+                    .reconnected(function () {                        
+                        showMessage('connection', 'Reconnection attempt succeeded.', true, 3000);
+                    })
+                    .disconnected(function () {
+                        showMessage('connection', 'Disconnected from server. Refresh the browser to reconnect.', false);                        
+                    });
+
+                // connect to SignalR endpoint
+                showMessage('connection', 'Connecting to server.', false);
+                $.connection.hub.start()
+                    .done(function () { hideMessage('connection'); })
+                    .fail(function (error) { showMessage('connection', error.message, false); });
+                   
+                // bind HTML events -------------------------------------------
+                
+                $(document).on('contextmenu', function (event) {
+                    // stop long touch hold from poping up context menus
+                    return false;
+                });
+
+                $(document).on('touchmove', function (event) {
+                    if (!sc.$('.EngListCont').has($(event.target)).length &&
+                        !sc.$('.FuncListCont').has($(event.target)).length)
+                        // prevents overscroll effect that some browsers do (e.g. iOS)
+                        // but makes exception for panels we do want to allow scrolling
+                        event.preventDefault();
+                });
+
+                $('#Menu').tap(function (event) {
+                    showMessage('notimplemented', 'Menu to be implemented.', true);                    
+                });
+
+                $('#Options').tap(function (event) {
+                    showMessage('notimplemented', 'Options to be implemented.', true);                    
+                });
+
+                // open engine pick list                
+                $('.Button.OpenEngList').tap(function (event) {
+                    var throtIdx = $(this).data('throt');
+                    var listPanel = sc.$('.EngListPanel[data-throt=' + throtIdx + ']');
+                    var engList = sc.$('.EngList[data-throt=' + throtIdx + ']');
+                    engList.html(
+                        '<div class="FlexContAlignCC" style="margin-top:10px">' +
+                            '<img src="loading.gif" />' +
+                        '</div>' +
+                        '<div class="FlexContAlignCC" style="margin-top:5px">Loading</div>');
+                    if (throttles[throtIdx].engineID)
+                        sc.$('.Button.ReleaseEng[data-throt=' + throtIdx + ']').show();
+                    else
+                        sc.$('.Button.ReleaseEng[data-throt=' + throtIdx + ']').hide();
+                    var panelWidth = listPanel.width();
+                    listPanel
+                        .css({ left: panelWidth * ((throtIdx == 0) ? -1 : 1) + 'px', right: panelWidth * ((throtIdx == 0) ? 1 : -1) + 'px' })
+                        .show()
+                        .animate({ left: '0', right: '0' }, 250);
+
+                    engineProxy.server.GetList()
+                        .done(function (list) {
+                            if (list.length > 0)
+                                engList.html('');
+                            else
+                                engList.html('<div class="FlexContAlignCC" style="height:50px;">No engines defined.</div>');
+                            $.each(list, function (index, engine) {
+                                engList.append(
+                                    '<div class="Button FlexContHoriz" data-throt="' + throtIdx + '" data-engid="' + engine.ID + '" style="height:50px;padding:3px;margin-top:' + ((index == 0) ? '0' : '10') + 'px;">' +
+                                        '<div class="FlexContAlignCC" style="padding:0 5px;">' +
+                                            '<img src="engine.svg" style="height:40px;" />' +
+                                        '</div>' +
+                                        '<div class="FlexItemAuto FlexContVert" style="margin-left:5px;">' +
+                                            '<div class="EngineAddr">' + engine.Address + '</div>' +
+                                            '<div class="EngineName">' + engine.Name + '</div>' +                                                
+                                        '</div>' +
+                                    '</div>');
+                            });                                                                
+                        })
+                        .fail(function (error) { showMessage('englist', error.message, true); });
+                });
+
+                // select engine from list
+                $(document).on('click', '.Button[data-engid]', function (event) {
+                    var throtIdx = $(this).data('throt');
+                    throttles[throtIdx].control($(this).data('engid'));
+                    closeEngList(throtIdx);
+                });
+
+                // release engine from throttle
+                $('.Button.ReleaseEng').tap(function (event) {
+                    var throtIdx = $(this).data('throt');
+                    throttles[throtIdx].release();
+                    closeEngList(throtIdx);
+                });
+
+                // close engine pick list
+                $('.EngListClose').tap(function (event) {
+                    var throtIdx = $(this).data('throt');
+                    closeEngList(throtIdx);
+                });
+
+                // common function for closing engine pick list
+                function closeEngList(throtIdx) {
+                    var listPanel = sc.$('.EngListPanel[data-throt=' + throtIdx + ']');
+                    var panelWidth = listPanel.width() + 10; // the 10 is a hack for Firefox which doesn't seem to complete the animation so we have to tell it to animate more
+                    listPanel.animate({ left: panelWidth * ((throtIdx == 0) ? -1 : 1) + 'px', right: panelWidth * ((throtIdx == 0) ? 1 : -1) + 'px' }, 250, function () {
+                        listPanel
+                            .hide()
+                            .css({ left: '0', right: '0' });
+                    });
+                };
+
+                // speed sliders
+                $('.SpeedSlider').pointerDrag(function (event) {
+                    var throt = throttles[$(this).data('throt')];
+                    switch (event.action) {
+                        case 'down':
+                            throt.ptrDownSpeed = throt.speed;
+                            break;
+                        case 'move':
+                            if ((event.firstMove) && (throt.speed == 0)) throt.direction = (event.deltaY < 0) ? 'F' : 'R';
+                            var sliderPercent = Math.abs(event.deltaY / ($(this).height() / 2));
+                            var normal = ((throt.direction == 'F' && event.deltaY < 0) || (throt.direction == 'R' && event.deltaY > 0)) ? 1 : -1;
+                            throt.speed = Math.round(throt.ptrDownSpeed + sliderPercent * throt.maxSpeed * normal / Throttle.settings.spdSliderRatio);
+                            break;
+                        case 'up':
+                            if ((throt.ptrDownSpeed == throt.speed) && (throt.speed == 0)) {
+                                throt.direction = (event.elem().y < $(this).height() / 2) ? 'F' : 'R';
+                            }
+                    }
+                });
+
+                // speed ramp buttons
+                $('.SpeedRamp').pointerDrag(function (event) {
+                    var throt = throttles[$(this).data('throt')];
+                    var me = this;
+
+                    function setRampDeltaAmt() {        
+                        var elem = event.elem();
+                        var height = $(me).height();                        // height of element hot spot
+                        var rampDir = (elem.y < height * .5) ? 'F' : 'R';   // which button the finger is over (forward/reverse)
+                        var divergence = (rampDir == 'F') ? (height * .25 - elem.y) : (elem.y - .75 * height);  // touch distance away start of ramp                      
+                        if (divergence < 0) divergence = 0;                 // ignore divergence in opposite direction of button                        
+                        var divergePercent = divergence / (height * .25);   // divergence as a percentage of a ramp button's height
+                        if (divergePercent > 1) divergePercent = 1;         // limit operating divergence to no more than 100%
+                        var spdNormal = (throt.direction == rampDir) ? 1 : -1;
+                        throt.rampDeltaAmt = Math.round((1 + divergePercent * (Throttle.settings.spdRampMaxStep - 1)) * spdNormal);
+                    }
+
+                    function setSpeed() {                        
+                        throt.speed += throt.rampDeltaAmt;
+                    }
+
+                    switch (event.action) {
+                        case 'down':
+                            if (throt.speed == 0) throt.direction = (event.elem().y < $(this).height() / 2) ? 'F' : 'R';
+                            setRampDeltaAmt();
+                            setSpeed();
+                            clearInterval(throt.rampTimerId);  // in case the 'up' event was not triggered
+                            throt.rampTimerId = setInterval(setSpeed, Throttle.settings.spdRampTimeInt);
+                            break;
+                        case 'move':
+                            setRampDeltaAmt();
+                            break;
+                        case 'up':
+                            clearInterval(throt.rampTimerId);
+                            throt.rampTimerId = null;
+                    }
+                });
+                
+                // emergency stop button
+                $('.Button.EStop').tap(function (event) {
+                    var throt = throttles[$(this).data('throt')];
+                    throt.eStop();
+                });
+                
+                // toggle button functions (fixed)
+                $('.Button.Function[data-num!=2][data-fixed=1]').tap(function (event) {
+                    var throt = throttles[$(this).data('throt')];
+                    var num = $(this).data('num');
+                    throt.function(num, ((throt.function(num) == 0) ? 1 : 0));
+                });
+
+                // push button functions (fixed)
+                $('.Button.Function[data-num=2]').pushButton(function (event) {
+                    var throt = throttles[$(this).data('throt')];
+                    var num = $(this).data('num');
+                    switch (event.action) {
+                        case 'down':
+                            throt.function(num, 1);
+                            break;
+                        case 'up':
+                            throt.function(num, 0);
+                    }
+                });
+
+                // toggle button functions (scrollable)
+                $('.Button.Function[data-fixed=0]').click(function (event) {
+                    var throt = throttles[$(this).data('throt')];
+                    var num = $(this).data('num');
+                    throt.function(num, ((throt.function(num) == 0) ? 1 : 0));
+                });
+
+                // message items close
+                $(document).on('click', '.MessageItem', function (event) {
+                    if ($(this).children(':nth-child(2)').is(":hidden")) return;
+                    hideMessage($(this).data('key'));
+                });
+
+                // responsive design ----------------------------------
+
+                onResize();
+                $(window).resize(onResize);
+                    
+                function onResize() {
+                    window.requestAnimationFrame(function () {
+                        if ($(window).height() < 450)
+                            showMessage('screen', 'Screen height is too small for proper operation.', false);
+                        else
+                            hideMessage('screen');
+
+                        // make scrollable function button heights the same as fixed ones
+                        var height = sc.$('.Button.Function[data-fixed=1]:first').height();
+                        sc.$('.Button.Function[data-fixed=0]').height(height);
+                    });
+                };
+            });
+
+            function renderThrottle(changeScope, throt) {
+
+                if ($.inArray(changeScope, ['Eng', 'All']) != -1) {
+                    if (throt.engineID) {
+                        sc.$('.EngineAdd[data-throt=' + throt.index + ']').hide();
+                        sc.$('.EngineShown[data-throt=' + throt.index + ']').show();
+                        sc.$('.EngineAddr[data-throt=' + throt.index + ']').html(throt.address);
+                        sc.$('.EngineName[data-throt=' + throt.index + ']').html(throt.name);
+                    } else {
+                        sc.$('.EngineShown[data-throt=' + throt.index + ']').hide();
+                        sc.$('.EngineAdd[data-throt=' + throt.index + ']').show();
+                    };
+                };
+
+                if (changeScope == 'Spd' && Throttle.settings.enableSpdSound) {
+                    speedTic.play();
+                }
+
+                if ($.inArray(changeScope, ['Spd', 'Dir', 'All']) != -1) {
+
+                    // speed indication depends on direction so it must be refreshed when the direction changes
+
+                    var normSpeed = throt.speed / throt.maxSpeed;
+                    var barSpeed = normSpeed * 16;
+                    var percentSpeed = normSpeed * 100;
+
+                    sc.$('.SpeedBar[data-throt=' + throt.index + ']').each(function (index) {
+                        $(this).removeClass('_25 _50 _75 _100');
+                        if ($(this).data('dir') == throt.direction) {
+                            var bar = $(this).data('bar');
+                            if (bar <= Math.round(barSpeed)) {
+                                switch (true) {
+                                    case bar <= 4:
+                                        $(this).addClass('_25');
+                                        break;
+                                    case bar <= 8:
+                                        $(this).addClass('_50');
+                                        break;
+                                    case bar <= 12:
+                                        $(this).addClass('_75');
+                                        break;
+                                    default:
+                                        $(this).addClass('_100');
+                                }
+                            }
+                        }
+                    });
+
+                    var displaySpeed = (Throttle.settings.spdFormat == '%') ? (Math.round(percentSpeed) + '%') : throt.speed;
+                    // used an input field to display fast changing values because Firefox and Safary perform very poorly when updating layout with ".html()" in large DOM
+                    sc.$('.SpeedNum[data-throt=' + throt.index + ']').val(displaySpeed);                   
+                };
+
+                if ($.inArray(changeScope, ['Dir', 'All']) != -1) {
+                    sc.$('.Direction[data-throt=' + throt.index + ']').attr('src', ((throt.direction == 'F') ? 'forward.svg' : 'reverse.svg'));
+                };
+
+                if ($.inArray(changeScope, ['Func', 'All']) != -1) {
+                    $.each(throt.functions(), function (index, state) {
+                        var button = sc.$('.Button.Function[data-num=' + index + '][data-throt=' + throt.index + ']');
+                        if (state == 1) button.addClass('On'); else button.removeClass('On');
+                    });
+                };
+            }
+
+            function showMessage(grpKey, msg, closable, timeout) {
+                var cont = sc.$('.MessagePanel > div');
+                var item = cont.children('.MessageItem[data-key=' + grpKey + ']');           
+                if (item.length) {
+                    // item with given grpKey was found
+                    clearTimeout(item.data('timer-id'));  // in case previous message in grpKey had a timer that hasn't expired 
+                } else {
+                    // item with given grpKey was not found so append it
+                    item = $(
+                        '<div class="MessageItem FlexContHoriz" data-key="' + grpKey + '" style="margin-bottom:10px;">' +
+                            '<div class="FlexItemAuto"></div>' +
+                            '<div class="FlexContAlignCC" style="margin-left:20px;">' +
+                                '<img src="delete-white.svg" style="width:19px;" />' +
+                            '</div>' +
+                        '</div>').appendTo(cont);
+                };
+                item.children(':nth-child(1)').html(msg);
+                if (closable) {
+                    item.children(':nth-child(2)').show();
+                    item.css({ cursor: 'pointer' }); // mobile Safari actually needs this for delegate click events to be bound (stupid)
+                } else {
+                    item.children(':nth-child(2)').hide();
+                    item.css({ cursor: 'default' });
+                }
+                item.data('timer-id', (timeout) ? setTimeout(function () { hideMessage(grpKey); }, timeout) : '');
+                sc.$('.MessagePanel').show();
+            }
+
+            function hideMessage(grpKey) {
+                var cont = sc.$('.MessagePanel > div');
+                var item = cont.children('.MessageItem[data-key=' + grpKey + ']');
+                if (item.length) {
+                    // item with given grpKey was found so remove it
+                    clearTimeout(item.data('timer-id'));  // in case timer hasn't expired 
+                    item.remove();
+                };
+                if (!cont.children().length) {
+                    // hide panel when last item is removed
+                    sc.$('.MessagePanel').hide();
+                };
+            }
+        </script>
+    </head>
+    <body>
+        <div class="FlexContVert" style="height:100%;">
+
+            <!--title bar-->
+            <div class="FlexContHoriz" style="height:40px;">
+                <div id="Menu" class="FlexContAlignCC" style="padding:0 15px 0 10px;">
+                    <img src="menu.svg" width="19" />
+                </div>
+                <div class="TitleBar FlexItemAuto FlexContAlignCC">
+                    Remote Throttle&nbsp;-&nbsp;<span id="ClientName" />
+                </div>
+                <div id="Options" class="FlexContAlignCC" style="padding:0 10px 0 15px;">
+                    <img src="gear.svg" width="19" />
+                </div>
+            </div>
+
+            <!--throttle pair-->
+            <div class="FlexItemAuto FlexContHoriz" style="position:relative;padding:0 5px 5px 5px;">
+
+                <!--left throttle-->
+                <div class="Throttle FlexItemAuto FlexContVert" style="position:relative;">
+                    <div class="Button OpenEngList FlexContVert" data-throt="0" style="height:50px;padding:3px;">
+                        <div class="EngineAdd FlexItemAuto FlexContAlignCC" data-throt="0">
+                            <img src="add.svg" height="21" />
+                        </div>
+                        <div class="EngineShown FlexContHoriz" data-throt="0">
+                            <div class="FlexContAlignCC" style="padding:0 5px;">
+                                <img src="engine.svg" style="height:40px;" />
+                            </div>
+                            <div class="FlexItemAuto FlexContVert" style="margin-left:5px;">
+                                <div class="EngineAddr" data-throt="0"></div>
+                                <div class="EngineName" data-throt="0"></div>                                
+                            </div>                           
+                        </div>
+                    </div>
+                    <div class="FlexItemAuto FlexContHoriz" style="margin-top:10px;">
+
+                        <!--speed control-->
+                        <div class="FlexItemAuto FlexContVert" style="flex:2.25;position:relative;">
+
+                            <!--forward control-->
+                            <div class="FlexItemAuto FlexContHoriz">
+
+                                <!--speed buttons-->
+                                <div class="FlexItemAuto FlexContVert">
+
+                                    <!--speed/dir indicator-->
+                                    <div class="FlexItemAuto" style="margin-bottom:5px;">
+                                        <div class="SpeedDir">
+                                            <input class="SpeedNum" type="text" data-throt="0" disabled="disabled" />
+                                            <div style="padding:0 0 5px 0;text-align:center;">
+                                                <img class="Direction" src="forward.svg" style="width:20px;" data-throt="0" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!--up ramp button-->
+                                    <div class="Button FlexItemAuto FlexContVert">
+                                        <img class="FlexItemAuto" src="ramp-for.svg" style="height:100%;padding-top:5px;" />
+                                    </div>
+
+                                    <div style="background-color:#4C4C4C;height:5px;margin:0 10px;"></div>
+
+                                    <!--up button-->
+                                    <div class="Button FlatB FlexItemAuto FlexContAlignCC">
+                                        <img src="spd-for.svg" style="width:20px;" />
+                                    </div> 
+                                </div>
+
+                                <!--speed step bars-->
+                                <div class="FlexItemAuto FlexContVert" style="margin-left:10px;">
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="F" data-bar="16"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="F" data-bar="15"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="F" data-bar="14"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="F" data-bar="13"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="F" data-bar="12"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="F" data-bar="11"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="F" data-bar="10"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="F" data-bar="9"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="F" data-bar="8"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="F" data-bar="7"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="F" data-bar="6"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="F" data-bar="5"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="F" data-bar="4"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="F" data-bar="3"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="F" data-bar="2"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="F" data-bar="1"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                </div>
+                            </div>
+
+                            <div style="height:1px;border:1px solid white;"></div>
+
+                            <!--reverse control-->
+                            <div class="FlexItemAuto FlexContHoriz">
+
+                                <!--speed buttons-->
+                                <div class="FlexItemAuto FlexContVert">
+          
+                                    <!--down button-->
+                                    <div class="Button FlatT FlexItemAuto FlexContAlignCC">
+                                        <img src="spd-rev.svg" style="width:20px;" />
+                                    </div>
+
+                                    <div style="background-color:#4C4C4C;height:5px;margin:0 10px;"></div>
+
+                                    <!--down ramp button-->
+                                    <div class="Button FlexItemAuto FlexContVert">
+                                        <img class="FlexItemAuto" src="ramp-rev.svg" style="height:100%;padding-bottom:5px;" />
+                                    </div>             
+
+                                    <!--emergency stop button-->
+                                    <div class="Button Red EStop FlexItemAuto FlexContAlignCC" data-throt="0" style="margin-top:5px;">
+                                        <img src="stop.svg" style="width:25px;" />
+                                    </div>
+                                </div>
+
+                                <!--speed step bars-->
+                                <div class="FlexItemAuto FlexContVert" style="margin-left:10px;">
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="R" data-bar="1"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="R" data-bar="2"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="R" data-bar="3"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="R" data-bar="4"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="R" data-bar="5"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="R" data-bar="6"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="R" data-bar="7"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="R" data-bar="8"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="R" data-bar="9"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="R" data-bar="10"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="R" data-bar="11"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="R" data-bar="12"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="R" data-bar="13"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="R" data-bar="14"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="R" data-bar="15"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="0" data-dir="R" data-bar="16"></div>
+                                </div>
+                            </div>
+
+                            <!--touch hot spot overlays-->
+                            <div class="FlexContHoriz" style="top:0px;bottom:0px;right:0px;left:0px;position:absolute;pointer-events:none;">
+                                <div class="FlexItemAuto FlexContVert">
+                                    <div class="FlexItemAuto"></div>
+                                    <div class="SpeedRamp FlexItemAuto" data-throt="0" style="flex:4;margin-top:-1px;pointer-events:auto;"></div>
+                                    <div class="FlexItemAuto"></div>
+                                </div>
+                                <div class="SpeedSlider FlexItemAuto" data-throt="0" style="margin-left:10px;pointer-events:auto;"></div>
+                            </div>
+                        </div>
+
+                        <!--function buttons-->
+                        <div class="FlexItemAuto FlexContVert" style="margin-left:10px;">
+                            <div class="FlexItemAuto FlexContVert" style="margin-bottom:5px;">
+                                <div class="Button Function FlexItemAuto FlexContAlignCC" data-throt="0" data-num="0" data-fixed="1">
+                                    <img src="headlight.svg" style="width:22px;" />
+                                </div>
+                                <div class="Button Function FlexItemAuto FlexContAlignCC" data-throt="0" data-num="1" data-fixed="1" style="margin-top:10px;">
+                                    <img src="bell.svg" style="height:22px;" />
+                                </div>
+                                <div class="Button Function FlexItemAuto FlexContAlignCC" data-throt="0" data-num="2" data-fixed="1" style="margin-top:10px;">
+                                    <img src="horn.svg" style="width:22px;" />
+                                </div>
+                                <div class="Button Function FlexItemAuto FlexContAlignCC" data-throt="0" data-num="3" data-fixed="1" style="margin-top:10px;">
+                                    <img src="hook.svg" style="width:22px;" />
+                                </div>
+                            </div>
+                            <div class="FuncListCont FlexItemAuto" style="margin-top:5px;overflow:auto;">
+                                <div class="FuncList">
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="4" data-fixed="0">
+                                        <img src="func04.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="5" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func05.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="6" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func06.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="7" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func07.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="8" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func08.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="9" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func09.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="10" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func10.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="11" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func11.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="12" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func12.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="13" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func13.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="14" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func14.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="15" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func15.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="16" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func16.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="17" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func17.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="18" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func18.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="19" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func19.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="20" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func20.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="21" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func21.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="22" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func22.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="23" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func23.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="24" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func24.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="25" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func25.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="26" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func26.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="27" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func27.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="0" data-num="28" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func28.svg" style="height:22px;" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--engine pick list-->
+                    <div class="EngListPanel FlexContVert" data-throt="0" style="display:none;">
+                        <div class="FlexContHoriz" style="margin-bottom:10px;height:50px;">
+                            <div class="EngListClose FlexItemAuto FlexContAlignCC" data-throt="0">
+                                <img src="left.svg" height="21" />
+                            </div>    
+                            <div class="FlexItemAuto FlexContVert">
+                                <div class="Button Red ReleaseEng FlexItemAuto FlexContAlignCC" data-throt="0">
+                                    <img src="delete-red.svg" height="19" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="EngListCont FlexItemAuto" style="overflow:auto;"> 
+                            <div class="EngList" data-throt="0"></div> <!-- needed so spaces between list items can also be touch scrolled -->                           
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ThrottleDiv" class="FlexItemAuto"></div>
+
+                <!--right throttle-->
+                <div class="Throttle FlexItemAuto FlexContVert" style="position:relative;margin-left:10px;">
+                    <div class="Button OpenEngList FlexContVert" data-throt="1" style="height:50px;padding:3px;">
+                        <div class="EngineAdd FlexItemAuto FlexContAlignCC" data-throt="1">
+                            <img src="add.svg" height="21" />
+                        </div>
+                        <div class="EngineShown FlexContHoriz" data-throt="1">
+                            <div class="FlexContAlignCC" style="padding:0 5px;">
+                                <img src="engine.svg" style="height:40px;" />
+                            </div>
+                            <div class="FlexItemAuto FlexContVert" style="margin-left:5px;">
+                                <div class="EngineAddr" data-throt="1"></div>
+                                <div class="EngineName" data-throt="1"></div>                                
+                            </div> 
+                        </div>
+                    </div>
+                    <div class="FlexItemAuto FlexContHoriz" style="margin-top:10px;">
+
+                        <!--function buttons-->
+                        <div class="FlexItemAuto FlexContVert">
+                            <div class="FlexItemAuto FlexContVert" style="margin-bottom:5px;">
+                                <div class="Button Function FlexItemAuto FlexContAlignCC" data-throt="1" data-num="0" data-fixed="1">
+                                    <img src="headlight.svg" style="width:22px;" />
+                                </div>
+                                <div class="Button Function FlexItemAuto FlexContAlignCC" data-throt="1" data-num="1" data-fixed="1" style="margin-top:10px;">
+                                    <img src="bell.svg" style="height:22px;" />
+                                </div>
+                                <div class="Button Function FlexItemAuto FlexContAlignCC" data-throt="1" data-num="2" data-fixed="1" style="margin-top:10px;">
+                                    <img src="horn.svg" style="width:22px;" />
+                                </div>
+                                <div class="Button Function FlexItemAuto FlexContAlignCC" data-throt="1" data-num="3" data-fixed="1" style="margin-top:10px;">
+                                    <img src="hook.svg" style="width:22px;" />
+                                </div>
+                            </div>
+                            <div class="FuncListCont FlexItemAuto" style="margin-top:5px;overflow:auto;">
+                                <div class="FuncList">
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="4" data-fixed="0">
+                                        <img src="func04.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="5" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func05.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="6" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func06.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="7" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func07.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="8" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func08.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="9" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func09.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="10" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func10.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="11" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func11.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="12" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func12.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="13" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func13.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="14" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func14.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="15" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func15.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="16" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func16.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="17" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func17.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="18" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func18.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="19" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func19.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="20" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func20.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="21" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func21.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="22" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func22.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="23" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func23.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="24" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func24.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="25" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func25.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="26" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func26.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="27" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func27.svg" style="height:22px;" />
+                                    </div>
+                                    <div class="Button Function FlexContAlignCC" data-throt="1" data-num="28" data-fixed="0" style="margin-top:10px;">
+                                        <img src="func28.svg" style="height:22px;" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--speed control-->
+                        <div class="FlexItemAuto FlexContVert" style="flex:2.25;position:relative;margin-left:10px;">
+
+                            <!--forward control-->
+                            <div class="FlexItemAuto FlexContHoriz">
+
+                                <!--speed step bars-->
+                                <div class="FlexItemAuto FlexContVert">
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="F" data-bar="16"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="F" data-bar="15"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="F" data-bar="14"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="F" data-bar="13"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="F" data-bar="12"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="F" data-bar="11"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="F" data-bar="10"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="F" data-bar="9"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="F" data-bar="8"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="F" data-bar="7"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="F" data-bar="6"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="F" data-bar="5"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="F" data-bar="4"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="F" data-bar="3"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="F" data-bar="2"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="F" data-bar="1"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                </div>
+
+                                <!--speed buttons-->
+                                <div class="FlexItemAuto FlexContVert" style="margin-left:10px;">
+
+                                    <!--speed/dir indicator-->
+                                    <div class="FlexItemAuto" style="margin-bottom:5px;">
+                                        <div class="SpeedDir">
+                                            <input class="SpeedNum" type="text" data-throt="1" disabled="disabled" />
+                                            <div style="padding:0 0 5px 0;text-align:center;">
+                                                <img class="Direction" src="forward.svg" style="width:20px;" data-throt="1" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!--up ramp button-->
+                                    <div class="Button FlexItemAuto FlexContVert">
+                                        <img class="FlexItemAuto" src="ramp-for.svg" style="height:100%;padding-top:5px;" />
+                                    </div> 
+
+                                    <div style="background-color:#4C4C4C;height:5px;margin:0 10px;"></div>
+
+                                    <!--up button-->
+                                    <div class="Button FlatB FlexItemAuto FlexContAlignCC">
+                                        <img src="spd-for.svg" style="width:20px;" />
+                                    </div>                                                                      
+                                </div>
+                            </div>
+
+                            <div style="height:1px;border:1px solid white;"></div>
+
+                            <!--reverse control-->
+                            <div class="FlexItemAuto FlexContHoriz">
+
+                                <!--speed step bars-->
+                                <div class="FlexItemAuto FlexContVert">
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="R" data-bar="1"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="R" data-bar="2"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="R" data-bar="3"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="R" data-bar="4"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="R" data-bar="5"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="R" data-bar="6"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="R" data-bar="7"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="R" data-bar="8"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="R" data-bar="9"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="R" data-bar="10"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="R" data-bar="11"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="R" data-bar="12"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="R" data-bar="13"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="R" data-bar="14"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="R" data-bar="15"></div>
+                                    <div class="FlexItemAuto" style="flex:.45"></div>
+                                    <div class="SpeedBar FlexItemAuto" data-throt="1" data-dir="R" data-bar="16"></div>
+                                </div>
+
+                                <!--speed buttons-->
+                                <div class="FlexItemAuto FlexContVert" style="margin-left:10px;">
+
+                                    <!--down button-->
+                                    <div class="Button FlatT FlexItemAuto FlexContAlignCC">
+                                        <img src="spd-rev.svg" style="width:20px;" />
+                                    </div> 
+
+                                    <div style="background-color:#4C4C4C;height:5px;margin:0 10px;"></div>
+                                    
+                                    <!--down ramp button-->
+                                    <div class="Button FlexItemAuto FlexContVert">
+                                        <img class="FlexItemAuto" src="ramp-rev.svg" style="height:100%;padding-bottom:5px;" />
+                                    </div>           
+
+                                    <!--emergency stop button-->
+                                    <div class="Button Red EStop FlexItemAuto FlexContAlignCC" data-throt="1" style="margin-top:5px;">
+                                        <img src="stop.svg" style="width:25px;" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--touch hot spot overlays-->
+                            <div class="FlexContHoriz" style="top:0px;bottom:0px;right:0px;left:0px;position:absolute;pointer-events:none;">
+                                <div class="SpeedSlider FlexItemAuto" data-throt="1" style="margin-right:10px;pointer-events:auto;"></div>
+                                <div class="FlexItemAuto FlexContVert">
+                                    <div class="FlexItemAuto"></div>
+                                    <div class="SpeedRamp FlexItemAuto" data-throt="1" style="flex:4;margin-top:-1px;pointer-events:auto;"></div>
+                                    <div class="FlexItemAuto"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--engine pick list-->
+                    <div class="EngListPanel FlexContVert" data-throt="1" style="display:none;">
+                        <div class="FlexContHoriz" style="margin-bottom:10px;height:50px;">
+                            <div class="FlexItemAuto FlexContVert">
+                                <div class="Button Red ReleaseEng FlexItemAuto FlexContAlignCC" data-throt="1">
+                                    <img src="delete-red.svg" height="19" />
+                                </div>
+                            </div>
+                            <div class="EngListClose FlexItemAuto FlexContAlignCC" data-throt="1">
+                                <img src="right.svg" height="21" />
+                            </div>
+                        </div>
+                        <div class="EngListCont FlexItemAuto" style="overflow:auto;">
+                            <div class="EngList" data-throt="1"></div> <!-- needed so spaces between list items can also be touch scrolled -->
+                        </div>
+                    </div>
+                </div>
+
+                <!--messaging-->
+                <div class="MessagePanel FlexContAlignCC">
+                    <div style="width:80%;max-width:400px;"></div>
+                </div>
+            </div>
+
+        </div>
+    </body>
+</html>

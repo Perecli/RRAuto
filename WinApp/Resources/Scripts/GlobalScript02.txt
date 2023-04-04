@@ -1,0 +1,3 @@
+Public Function MyFuncName() as Object
+	'Enter code here
+End Function

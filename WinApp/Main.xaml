@@ -1,0 +1,264 @@
+﻿<sr:RibbonWindow x:Class="Windows.Main"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sr="http://schemas.divelements.co.uk/wpf/sandribbon"
+    xmlns:sd="http://schemas.divelements.co.uk/wpf/sanddock" 
+    Width="959" Height="751" WindowStartupLocation="CenterScreen" WindowState="Maximized" Name="RibbonWindow" KeyDown="ShortCutKeys" 
+    Icon="/Resources/RRAuto.png" Appearance="Office2007Silver">
+
+    <sr:RibbonWindow.Ribbon>
+        <sr:Ribbon Name="Ribbon" ApplicationButtonImage="/Resources/RRAuto.png">
+            
+            <sr:Ribbon.ToolBar>
+                <sr:ToolBar>
+                    <sr:Shortcut Target="{Binding ElementName=MenuNew}" />
+                    <sr:Shortcut Target="{Binding ElementName=MenuOpen}" />
+                    <sr:Shortcut Target="{Binding ElementName=MenuSave}" />
+                    <Separator />
+                    <sr:Button Text="Mode" Name="BtnMode" Activate="ToggleMode" NormalSize="Small" Image="{StaticResource IconEdit}" ToolTip="Toggle Mode (F5)" sr:SuperToolTip.Description="Toggles between operation mode and edit mode." />
+                </sr:ToolBar>
+            </sr:Ribbon.ToolBar>
+            
+            <sr:Ribbon.ApplicationPopup>
+                <sr:ApplicationPopup OpenDocument="OpenRecentDocument" ShowOptions="OpenOptions">
+                    <sr:MenuItem Text="_New" Name="MenuNew" Activate="NewLayout" Image="{StaticResource IconNew}" sr:KeyboardAccess.Keys="N" ToolTip="New (Ctrl+N)" sr:SuperToolTip.Description="Closes current layout and opens a blank one." />
+                    <sr:MenuItem Text="_Open" Name="MenuOpen" Activate="OpenLayout" Image="{StaticResource IconOpen}" sr:KeyboardAccess.Keys="O" ToolTip="Open (Ctrl+O)" sr:SuperToolTip.Description="Closes current layout and opens another one from from given path." />
+                    <sr:MenuItem Text="_Save" Name="MenuSave" Activate="SaveLayout" Image="{StaticResource IconSave}" sr:KeyboardAccess.Keys="S" ToolTip="Save (Ctrl+S)" sr:SuperToolTip.Description="Saves current layout." />
+                    <sr:MenuItem Text="Save As..." Name="MenuSaveAs" Activate="SaveAsLayout" Image="{StaticResource IconSaveAs}" sr:KeyboardAccess.Keys="A"/>
+                    <Separator />
+                    <sr:MenuItem Text="Change Log" Name="MenuChangeLog" Activate="OpenChangeLog" sr:KeyboardAccess.Keys="R"/>
+                    <sr:MenuItem Text="About..." Name="MenuAbout" sr:KeyboardAccess.Keys="?">
+                        <sr:RibbonPopup>
+                            <sr:RibbonPopup.Background>
+                                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                    <GradientStop Color="#FFFFFFFF" Offset="0.018"/>
+                                    <GradientStop Color="#FFCACFDC" Offset="1"/>
+                                </LinearGradientBrush>
+                            </sr:RibbonPopup.Background>
+                            <Grid>
+                                <Image Margin="37,10,0,0" Stretch="Fill" Width="55" Height="55" Source="/Resources/RRAuto.png" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                                <TextBlock Margin="105,18,37,0" Name="AppName" FontFamily="Segoe UI" FontSize="22" FontStyle="Italic" FontWeight="Bold" Foreground="#FF412A00" LineHeight="22" LineStackingStrategy="BlockLineHeight" Text="Railroad Automation" TextWrapping="Wrap" TextAlignment="Left" VerticalAlignment="Top" />
+                                <StackPanel Margin="37,74,30,12">
+                                    <TextBlock Name="Version" FontFamily="Segoe UI" FontSize="14" Foreground="#FF412A00" Text="Version: 0.0.0.0" />
+                                    <TextBlock Name="Deployment" FontFamily="Segoe UI" FontSize="14" Foreground="#FF412A00" Text="Deployment: Deployment Type" />
+                                    <TextBlock Name="Developed" FontFamily="Segoe UI" FontSize="14" Foreground="#FF412A00" Text="Developed by: Perecli Manole" />
+                                    <TextBlock Name="Site" FontFamily="Segoe UI" FontSize="14" >
+                                        <Hyperlink Click="OpenRRAutoSite" Foreground="#FF412A00">www.perecli.com/rrauto</Hyperlink>
+                                    </TextBlock>
+                                    <TextBlock Name="Email" FontFamily="Segoe UI" FontSize="14">
+                                        <Hyperlink Click="OpenEmail" Foreground="#FF412A00">perecli@live.com</Hyperlink>
+                                    </TextBlock>
+                                    <TextBlock Margin="0,10,0,0" FontFamily="Segoe UI" FontSize="12" Foreground="#FF412A00" Text="Donations accepted through:" />
+                                    <Grid Margin="0,3,0,0">
+                                        <Border Margin="30,0,0,0" BorderBrush="Gray" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                            <Image Cursor="Hand" Stretch="None" MouseLeftButtonUp="OpenPaypal" Source="/Resources/Paypal.png" />
+                                        </Border>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </sr:RibbonPopup>
+                    </sr:MenuItem>
+                </sr:ApplicationPopup>
+            </sr:Ribbon.ApplicationPopup>
+            
+            <sr:RibbonTab Name="Operation" Text="Operation" sr:KeyboardAccess.Keys="O">
+                
+                <sr:RibbonGroup Name="RibGrpActions" Header="Actions" ShowDialogLauncher="False" Image="{StaticResource IconGear}">
+                    <sr:RibbonGroup.Variants>
+                        <sr:GroupVariant Variant="Collapsed" Priority="7" />
+                     </sr:RibbonGroup.Variants>
+                    <sr:Button Text="Edit Mode" Activate="SetEditMode" NormalSize="Large" Image="{StaticResource IconEdit}" ToolTip="Edit Mode" sr:SuperToolTip.Description="Places application in edit mode." ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="EM"/>                                                         
+                    <Separator />
+                    <sr:Button Text="Broadcast States" Name="BtnBroadcastStates" Activate="BroadcastStates" NormalSize="Large" Image="{StaticResource IconBroadcast}"    ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="BS" ToolTip="Broadcast States (Ctrl+B)" sr:SuperToolTip.Description="Transmits commands on to the Loconet network to set the states of all CTC objets. This ensures the states of the physical objects are synchronized to their virtual counterparts. Only available in operation mode." />
+                    <sr:Button Text="Query Sensors"    Name="BtnQuerySensors"    Activate="QuerySensors"    NormalSize="Large" Image="{StaticResource IconQuerySensors}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="QS" ToolTip="Query Sensors (Ctrl+Q)"    sr:SuperToolTip.Description="Transmits commands on to the Loconet network to instigate the sensors to report their current states. This ensures the states of the virtual objects are synchronized to their physical counterparts. Only available in operation mode." />                  
+                </sr:RibbonGroup>
+
+                <sr:RibbonGroup Name="RibGrpRemoting" Header="Remoting" ShowDialogLauncher="False" Image="{StaticResource IconRemoting}">
+                    <sr:RibbonGroup.Variants>
+                        <sr:GroupVariant Variant="Collapsed" Priority="6" />
+                    </sr:RibbonGroup.Variants>
+                    <sr:Button Text="Remoting Service" Activate="RemotingService"   NormalSize="Large" Image="{StaticResource IconRemoting}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="RS" ToolTip="Remoting Service"   sr:SuperToolTip.Description="Enables/disables the remoting hosting service." />
+                    <sr:Button Text="Remote Conns."    Activate="RemoteConnections" NormalSize="Large" Image="{StaticResource IconNetwork}"  ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="RC" ToolTip="Remote Connections" sr:SuperToolTip.Description="Shows/hides the remote connections docking content." />
+                </sr:RibbonGroup>
+
+                <sr:RibbonGroup Name="RibGrpSpeech" Header="Speech" ShowDialogLauncher="False" Image="{StaticResource IconMicrophone}">
+                    <sr:RibbonGroup.Variants>
+                        <sr:GroupVariant Variant="Medium" Priority="2" />
+                        <sr:GroupVariant Variant="Collapsed" Priority="5" />
+                    </sr:RibbonGroup.Variants>
+                    <sr:CollapsiblePanel>
+                        <sr:Button Text="Speech Service" Activate="SpeechService"     CollapseToMedium="WhenGroupIsMedium" NormalSize="Large" Image="{StaticResource IconMicrophone}" ToolTip="Speech Recognition Service" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="SS" sr:SuperToolTip.Description="Enables/disables control through speech recognition. Relevant only in operation mode." />
+                        <sr:Button Text="Voice Feedback" Activate="VoiceFeedback"     CollapseToMedium="WhenGroupIsMedium" NormalSize="Large" Image="{StaticResource IconMegaphone}"  ToolTip="Voice Feedback"             ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="VF" sr:SuperToolTip.Description="Enables/disables voice feedback for speech commands. Relevant only if speech recognition is enabled." />
+                        <sr:Button Text="Speech Grammar" Activate="OpenSpeechGrammar" CollapseToMedium="WhenGroupIsMedium" NormalSize="Large" Image="{StaticResource IconGrammar}"    ToolTip="Speech Grammar"             ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="SG" sr:SuperToolTip.Description="Opens a syntax reference guide with supported speech commands." />
+                    </sr:CollapsiblePanel>
+                </sr:RibbonGroup>
+
+                <sr:RibbonGroup Name="RibGrpViews1" Header="Views" ShowDialogLauncher="False" Image="{StaticResource IconSwitchboard}">
+                    <sr:RibbonGroup.Variants>
+                        <sr:GroupVariant Variant="Medium" Priority="1" />
+                        <sr:GroupVariant Variant="Collapsed" Priority="4" />
+                    </sr:RibbonGroup.Variants>
+                    <sr:CollapsiblePanel>
+                        <sr:Button Text="Add SB Viewport" Activate="OpenSbViewport"                                         NormalSize="Large" Image="{StaticResource IconSwitchboard}"  ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="SB" ToolTip="Add Switchboard Viewport" sr:SuperToolTip.Description="Opens a new viewport into the switchboard as a tabbed document." />
+                        <sr:Button Text="Object Browser"  Activate="OpenObjectBrowser" CollapseToMedium="WhenGroupIsMedium" NormalSize="Large" Image="{StaticResource IconObjects}"       ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="OB" ToolTip="Object Browser"           sr:SuperToolTip.Description="Shows/hides the object browser docking content." />
+                        <sr:Button Text="Context Prop."   Activate="OpenProperties"    CollapseToMedium="WhenGroupIsMedium" NormalSize="Large" Image="{StaticResource IconProperties}"    ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="CP" ToolTip="Context Properties"       sr:SuperToolTip.Description="Shows/hides the selected object's properties docking content." />
+                        <sr:Button Text="CTC Events"      Activate="OpenCtcEvents"     CollapseToMedium="WhenGroupIsMedium" NormalSize="Large" Image="{StaticResource IconRailroadCross}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="CE" ToolTip="CTC Events"               sr:SuperToolTip.Description="Shows/hides the centralized traffic control events docking content." />
+                    </sr:CollapsiblePanel>
+                </sr:RibbonGroup>
+
+                <sr:RibbonGroup Name="RibGrpDocking1" Header="Docking" ShowDialogLauncher="False" Image="{StaticResource IconDockDefault}">
+                    <sr:RibbonGroup.Variants>
+                        <sr:GroupVariant Variant="Collapsed" Priority="3" />
+                    </sr:RibbonGroup.Variants>
+                    <StackPanel>
+                        <sr:Button Text="Close Docking" Activate="CloseDocking"     NormalSize="Medium" Image="{StaticResource IconDockClose}"   ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="DC" ToolTip="Close All (Ctrl+Del)"     sr:SuperToolTip.Description="Closes all docking panes leaving only the tabbed documents." />
+                        <sr:Button Text="To Last Saved" Activate="DockingToSaved"   NormalSize="Medium" Image="{StaticResource IconDockRestore}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="DS" ToolTip="To Last Saved (Ctrl+Ins)" sr:SuperToolTip.Description="Repositions the docking layout from the last save." />
+                        <sr:Button Text="To Default"    Activate="DockingToDefault" NormalSize="Medium" Image="{StaticResource IconDockDefault}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="DD" ToolTip="To Default"               sr:SuperToolTip.Description="Repositions the docking layout to default." />
+                    </StackPanel>
+                </sr:RibbonGroup>
+                
+                <sr:RibbonGroup Name="RibGrpTesting" Header="Testing" ShowDialogLauncher="False">      
+                    <sr:Button Text="Test 1" Activate="Test1" NormalSize="Large" Image="{StaticResource IconPlaceHolder}" />
+                    <sr:Button Text="Test 2" Activate="Test2" NormalSize="Large" Image="{StaticResource IconPlaceHolder}" />
+                    <sr:Button Text="Test 3" Activate="Test3" NormalSize="Large" Image="{StaticResource IconPlaceHolder}" />                    
+                </sr:RibbonGroup>
+                
+            </sr:RibbonTab>
+
+            <sr:RibbonTab Name="Editing" Text="Editing" sr:KeyboardAccess.Keys="E">
+
+                <sr:RibbonGroup Header="Actions" ShowDialogLauncher="False" Image="{StaticResource IconEdit}">
+                    <sr:RibbonGroup.Variants>
+                        <sr:GroupVariant Variant="Collapsed" Priority="8" />
+                    </sr:RibbonGroup.Variants>
+                    <sr:Button Text="Operation Mode" Name="BtnOpearation"  Activate="SetOperationMode" NormalSize="Large" Image="{StaticResource IconGear}"  ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="OM" ToolTip="Operation Mode" sr:SuperToolTip.Description="Places application in operation mode." />
+                    <Separator />
+                    <sr:Button Text="Reset States"   Name="BtnResetStates" Activate="ResetStates"      NormalSize="Large" Image="{StaticResource IconReset}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="RS" ToolTip="Reset States"   sr:SuperToolTip.Description="Resets all statefull objects to their default state and clears out existing pending dispositions. Only available in edit mode." />
+                </sr:RibbonGroup>
+
+                <sr:RibbonGroup Header="SB Track Sel. Mode" ShowDialogLauncher="False" Image="{StaticResource IconTrack}">
+                    <sr:RibbonGroup.Variants>
+                        <sr:GroupVariant Variant="Medium" Priority="3" />
+                        <sr:GroupVariant Variant="Collapsed" Priority="7" />
+                    </sr:RibbonGroup.Variants>
+                    <sr:CollapsiblePanel>
+                        <sr:Button Text="Select Tracks" Name="BtnSelTracks" Activate="SelTracks" CollapseToMedium="WhenGroupIsMedium" NormalSize="Large" Image="{StaticResource IconTrack}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="S1" ToolTip="Select Tracks (Space+1)" sr:SuperToolTip.Description="When clicking on a cell containing a track, that track object will be selected." />
+                        <sr:Button Text="Select Blocks" Name="BtnSelBlocks" Activate="SelBlocks" CollapseToMedium="WhenGroupIsMedium" NormalSize="Large" Image="{StaticResource IconBlock}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="S2" ToolTip="Select Blocks (Space+2)" sr:SuperToolTip.Description="When clicking on a cell containing a track, the block object associated with that track will be selected." />
+                        <sr:Button Text="Select Routes" Name="BtnSelRoutes" Activate="SelRoutes" CollapseToMedium="WhenGroupIsMedium" NormalSize="Large" Image="{StaticResource IconRoute}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="S3" ToolTip="Select Routes (Space+3)" sr:SuperToolTip.Description="When clicking on a cell containing a track, the first route object associated with that track will be selected. Click the cell again to cycle through all other associated routes." />
+                    </sr:CollapsiblePanel>
+                </sr:RibbonGroup>
+
+                <sr:RibbonGroup Header="Scripting" ShowDialogLauncher="False" Image="{StaticResource IconDocObjects}">
+                    <sr:RibbonGroup.Variants>
+                        <sr:GroupVariant Variant="Medium" Priority="2" />
+                        <sr:GroupVariant Variant="Collapsed" Priority="6" />
+                    </sr:RibbonGroup.Variants>
+                    <sr:CollapsiblePanel>
+                        <sr:Button Text="Check Script"  Name="BtnCheckScript"  Activate="CheckScript"                                              NormalSize="Large" Image="{StaticResource IconDocCheck}"    ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="CS" ToolTip="Check Script (Ctrl+K)"        sr:SuperToolTip.Description="Performs a test compile of all user script and reports any errors found. Compilation occurs automatically when entering operation mode so this step is not a required." />
+                        <sr:Button Text="Gen. Assem."                          Activate="OpenGenAssembly"     CollapseToMedium="WhenGroupIsMedium" NormalSize="Large" Image="{StaticResource IconDocGen}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="GA" ToolTip="Generated Scripting Assembly" sr:SuperToolTip.Description="Displays the assembly that will be automatically built and compiled from all the user script before operation." />
+                        <sr:Button Text="Export Script"                        Activate="OpenExportScript"    CollapseToMedium="WhenGroupIsMedium" NormalSize="Large" Image="{StaticResource IconDocExport}"   ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="ES" ToolTip="Export Script"                sr:SuperToolTip.Description="Exports all the user script to a text file." />
+                        <sr:Button Text="Script Templ."                        Activate="OpenScriptTemplates" CollapseToMedium="WhenGroupIsMedium" NormalSize="Large" Image="{StaticResource IconDocObjects}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="ST" ToolTip="Script Templates"             sr:SuperToolTip.Description="Opens a categorized list of commonly used script templates that can be dragged into any script editor window." />
+                        <sr:Button Text="Class Lib. Doc."                      Activate="OpenLibraryDocs"                                          NormalSize="Large" Image="{StaticResource IconLibraryDocs}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="CL" ToolTip="Class Library Documentation"  sr:SuperToolTip.Description="Opens the class library documentation to be used as a reference for scripting." />
+                    </sr:CollapsiblePanel>
+                </sr:RibbonGroup>
+
+                <sr:RibbonGroup Name="RibGrpViews2" Header="Views" ShowDialogLauncher="False" Image="{StaticResource IconSwitchboard}">
+                    <sr:RibbonGroup.Variants>
+                        <sr:GroupVariant Variant="Medium" Priority="1" />
+                        <sr:GroupVariant Variant="Collapsed" Priority="5" />
+                    </sr:RibbonGroup.Variants>
+                    <sr:CollapsiblePanel>
+                        <sr:Button Text="Add SB Viewport" Activate="OpenSbViewport"                                         NormalSize="Large" Image="{StaticResource IconSwitchboard}"  ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="SB" ToolTip="Add Switchboard Viewport" sr:SuperToolTip.Description="Opens a new viewport into the switchboard as a tabbed document." />
+                        <sr:Button Text="Object Browser"  Activate="OpenObjectBrowser" CollapseToMedium="WhenGroupIsMedium" NormalSize="Large" Image="{StaticResource IconObjects}"       ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="OB" ToolTip="Object Browser"           sr:SuperToolTip.Description="Shows/hides the object browser docking content." />
+                        <sr:Button Text="Context Prop."   Activate="OpenProperties"    CollapseToMedium="WhenGroupIsMedium" NormalSize="Large" Image="{StaticResource IconProperties}"    ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="CP" ToolTip="Context Properties"       sr:SuperToolTip.Description="Shows/hides the selected object's properties docking content." />
+                        <sr:Button Text="CTC Events"      Activate="OpenCtcEvents"     CollapseToMedium="WhenGroupIsMedium" NormalSize="Large" Image="{StaticResource IconRailroadCross}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="CE" ToolTip="CTC Events"               sr:SuperToolTip.Description="Shows/hides the centralized traffic control events docking content." />
+                    </sr:CollapsiblePanel>
+                </sr:RibbonGroup>
+
+                <sr:RibbonGroup Name="RibGrpDocking2" Header="Docking" ShowDialogLauncher="False" Image="{StaticResource IconDockDefault}">
+                    <sr:RibbonGroup.Variants>
+                        <sr:GroupVariant Variant="Collapsed" Priority="4" />
+                    </sr:RibbonGroup.Variants>
+                    <StackPanel>
+                        <sr:Button Text="Close Docking" Activate="CloseDocking"     NormalSize="Medium" Image="{StaticResource IconDockClose}"   ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="DC" ToolTip="Close All (Ctrl+Del)"     sr:SuperToolTip.Description="Closes all docking panes leaving only the tabbed documents." />
+                        <sr:Button Text="To Last Saved" Activate="DockingToSaved"   NormalSize="Medium" Image="{StaticResource IconDockRestore}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="DS" ToolTip="To Last Saved (Ctrl+Ins)" sr:SuperToolTip.Description="Repositions the docking layout from the last save." />
+                        <sr:Button Text="To Default"    Activate="DockingToDefault" NormalSize="Medium" Image="{StaticResource IconDockDefault}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="DD" ToolTip="To Default"               sr:SuperToolTip.Description="Repositions the docking layout to default." />
+                    </StackPanel>
+                </sr:RibbonGroup>
+
+            </sr:RibbonTab>
+
+            <sr:RibbonTab Text="Loconet" sr:KeyboardAccess.Keys="L">
+
+                <sr:RibbonGroup Header="Operation" ShowDialogLauncher="False" Image="{StaticResource IconTrackPower}">
+                    <sr:RibbonGroup.Variants>
+                        <sr:GroupVariant Variant="Collapsed" Priority="3" />
+                    </sr:RibbonGroup.Variants>
+                    <sr:Button Text="Loconet Connection" Name="BtnConnect"    Activate="ToggleConnection" NormalSize="Large" Image="{StaticResource IconConnect}"    ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="CN" ToolTip="Toggle Loconet Connection"   sr:SuperToolTip.Description="Extablishes/teminates the connection between the application and the Loconet command station." />
+                    <sr:Button Text="Track Power"        Name="BtnTrackPower" Activate="ToggleTrackPower" NormalSize="Large" Image="{StaticResource IconTrackPower}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="TP" ToolTip="Toggle Track Power (Ctrl+P)" sr:SuperToolTip.Description="Orders the Loconet command station to turn its track power on/off." />
+                </sr:RibbonGroup>
+
+                <sr:RibbonGroup Header="Displays" ShowDialogLauncher="False" Image="{StaticResource IconReport}">
+                    <sr:RibbonGroup.Variants>
+                        <sr:GroupVariant Variant="Collapsed" Priority="2" />
+                    </sr:RibbonGroup.Variants>
+                    <sr:Button Text="Slot Status"     Activate="OpenSlotStatus"    NormalSize="Large" Image="{StaticResource IconComStation}"    ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="SS" ToolTip="Slot Status"         sr:SuperToolTip.Description="Shows/hides the command station's slot data docking content." />
+                    <sr:Button Text="Loconet Packets" Activate="OpenLoconetLog"    NormalSize="Large" Image="{StaticResource IconPacketTraffic}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="PL" ToolTip="Loconet Packets Log" sr:SuperToolTip.Description="Shows/hides the Loconet packets running log docking content." />
+                    <sr:Button Text="Locobuf. Report" Activate="OpenLocoBufferRep" NormalSize="Large" Image="{StaticResource IconReport}"        ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="LR" ToolTip="Locobuffer Report"   sr:SuperToolTip.Description="Displays several Locobuffer statistics related to packet transmissions." />
+                </sr:RibbonGroup>
+
+                <sr:RibbonGroup Header="Programmers" ShowDialogLauncher="False" Image="{StaticResource IconDecoder}">
+                    <sr:RibbonGroup.Variants>
+                        <sr:GroupVariant Variant="Collapsed" Priority="1" />
+                    </sr:RibbonGroup.Variants>
+                    <sr:Button Text="LocoIO" Activate="OpenLocoIOProg" NormalSize="Large" Image="{StaticResource IconLocoIO}"  ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="LP" ToolTip="LocoIO Programmer" sr:SuperToolTip.Description="Opens a configuration tool for programming LocoIO devices." />
+                    <sr:Button Text="DCC"    Activate="OpenDccProg"    NormalSize="Large" Image="{StaticResource IconDecoder}" ToolTipService.ShowOnDisabled="True" sr:KeyboardAccess.Keys="DP" ToolTip="DCC Programmer"    sr:SuperToolTip.Description="Opens a configuration tool for programming CV values into DCC decoders." />                       
+                </sr:RibbonGroup>   
+                
+            </sr:RibbonTab>
+            
+        </sr:Ribbon>
+    </sr:RibbonWindow.Ribbon>
+    
+    <sd:DockSite Name="DockSite" AllowPopupUnpinnedWindows="false">
+        <sd:DocumentContainer>
+            <sd:SplitContainer />            
+        </sd:DocumentContainer>        
+    </sd:DockSite>
+           
+    <sr:RibbonWindow.StatusBar>
+        <sr:StatusBar>
+            <sr:Label Name="SblCol" Text="Col" Width="50" ToolTip="Switchboard column hover over" />
+            <sr:Label Name="SblRow" Text="Row" Width="50" ToolTip="Switchboard row hover over" />
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolTip="Application mode status">
+                <Image Name="SblModeImage" Width="16" Height="16" Margin="0,0,4,0" VerticalAlignment="Center" />
+                <sr:Label Name="SblModeText" Width="60" VerticalAlignment="Center" />    
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolTip="Loconet connection status">
+                <Image Name="SblConnectionImage" Width="16" Height="16" Margin="0,0,4,0" VerticalAlignment="Center" />
+                <sr:Label Name="SblConnectionText" Width="80" VerticalAlignment="Center" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolTip="Track power status">
+                <Image Name="SblTrackPowerImage" Width="16" Height="16" Margin="0,0,4,0" VerticalAlignment="Center" />
+                <sr:Label Name="SblTrackPowerText" Width="25" VerticalAlignment="Center" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolTip="Remoting service status">
+                <Image Name="SblRemotingServiceImage" Width="16" Height="16" Margin="0,0,4,0" VerticalAlignment="Center" Source="{StaticResource IconRemoting}" />
+                <sr:Label Name="SblRemotingServiceText" Width="230" VerticalAlignment="Center" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolTip="Speech recognition service status">
+                <Image Name="SblSpeechServiceImage" Width="16" Height="16" Margin="0,0,4,0" VerticalAlignment="Center" Source="{StaticResource IconMicrophone}" />
+                <sr:Label Name="SblSpeechServiceText" Width="55" VerticalAlignment="Center" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolTip="Voice feedback status">
+                <Image Name="SblVoiceFeedbackImage" Width="16" Height="16" Margin="0,0,4,0" VerticalAlignment="Center" Source="{StaticResource IconMegaphone}" />
+                <sr:Label Name="SblVoiceFeedbackText" Width="55" VerticalAlignment="Center" />
+            </StackPanel>         
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolTip="Speech recognition activity" >
+                <Image Name="SblSpeechImage" Width="16" Height="16" Margin="0,0,4,0" VerticalAlignment="Center" />
+                <sr:Label Name="SblSpeechText" Width="400" VerticalAlignment="Center" />
+            </StackPanel>          
+        </sr:StatusBar>
+    </sr:RibbonWindow.StatusBar>
+    
+</sr:RibbonWindow>

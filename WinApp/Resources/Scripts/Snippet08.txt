@@ -1,0 +1,9 @@
+'Check the state of the route
+Select Case CtcRoute("RouteName").State
+	Case Route.RouteState.Unlocked
+		'Do stuff if the route is not locked
+	Case Route.RouteState.Pending
+		'Do stuff if the route is in the process of being set or locked
+	Case Route.RouteState.Locked
+		'Do stuff if the route is locked
+End Select

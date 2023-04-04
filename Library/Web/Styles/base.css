@@ -1,0 +1,63 @@
+﻿body {
+	margin: 0px;
+	padding: 0px;
+
+    font-weight: normal;
+	font-size: 14px;
+	color: white;
+	font-family: verdana, geneva, arial, sans-serif;
+    line-height: 1.2; /* the default for this is different for each browsers so this makes them the same; notice if no "px" specified, it acts as a multiplier of font height */
+    background-color: black;
+
+    overflow: hidden; /* since we're always sizing to the window, get rid of scroll bars */  
+    
+    /* disables text selection */
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none;   /* Chrome/Safari/Opera */    
+    -moz-user-select: none;      /* Firefox */
+    -ms-user-select: none;       /* IE/Edge */
+    user-select: none;           /* non-prefixed version, currently not supported by any browser */  
+}
+
+* {  /* makes the size of an element contain the border, padding, and content but not the margin; for example, the default for <div> is content-box */
+    -moz-box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+    box-sizing: border-box;    
+}
+
+html, body, form {
+    height: 100%;  /* needed for elements to be sized to the browser's height */
+}
+
+a:link, a:visited {	
+	text-decoration: none;
+	color: #004078;
+}	
+a[href]:hover {	    /* we ignore this css on purpose if the link does not have an href attribute */
+	text-decoration: underline;
+	color: #006ecf;
+}
+a[href]:active {	/* we ignore this css on purpose if the link does not have an href attribute */
+	text-decoration: none;
+	color: #004078;
+}	
+
+img {
+    border: 0px;   
+    margin: 0px;
+	padding: 0px;
+    vertical-align: middle;     
+}
+
+input[type=text], input[type=password], textarea, select {
+    margin: 0px;  /* for Chrome since by default it adds margins on these  */
+    font-weight: normal;
+	font-size: 14px;
+	color: white;
+	font-family: verdana, geneva, arial, sans-serif;
+    line-height: 1.2;  /* doesn't seem to inherit from body and default is different depending on browser */
+}
+
+input[type=text], input[type=password], select {
+    height: 19px;  /* to maintain consistency between Chrome, Firefox, IE; Firefox was the real problem here */
+}

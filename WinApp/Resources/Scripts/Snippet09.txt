@@ -1,0 +1,10 @@
+'See documentation for all supported Loconet packet types
+
+'Check Loconet track power state
+Dim objTxPacket as new PkReqSlotData(0)
+Await CtcService.LoconetService.TxPacket(objTxPacket)
+Dim objRxPacket As PkRdWrSlotData = objTxPacket.RxPacket
+PostMsg(objRxPacket.TrackPowerIsOn)
+
+'Turn Loconet track power on
+CtcService.LoconetService.TxPacket(New PkSetPowerOn)

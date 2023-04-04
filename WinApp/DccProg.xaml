@@ -1,0 +1,13 @@
+﻿<Window x:Class="Windows.DccProg"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:wfi="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration" 
+    xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms" 
+    Name="DccWindow" Title="DCC Programmer" Height="244" Width="331" ShowInTaskbar="false" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow" Background="#FFF0F0F0" ResizeMode="NoResize">
+    <Grid>
+        <wfi:WindowsFormsHost Margin="12,12,12,47">
+            <wf:PropertyGrid x:Name="PropertyGrid" ToolbarVisible="False" PropertySort="NoSort" />
+        </wfi:WindowsFormsHost>
+        <Button Height="23" HorizontalAlignment="Right" Margin="0,0,12,12" Name="cmdWrite" VerticalAlignment="Bottom" Width="75">Write</Button>
+    </Grid>
+</Window>

@@ -1,0 +1,5 @@
+﻿'Gets automatically executed when exiting operation mode.
+'Use "Public Async Function OnCtcStop() as Task" if method contains any Awaits.
+Public Sub OnCtcStop()
+	'Enter code here
+End Sub

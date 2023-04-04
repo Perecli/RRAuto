@@ -1,0 +1,3 @@
+﻿'This single line step is awaited by the caller because Delay() returns a Task and 
+'the step in turn returns that task through the Function()
+o.Step("StepName", Function() Delay(1000))

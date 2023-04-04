@@ -1,0 +1,312 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ArrayOfConfigLanguage>
+  <ConfigLanguage name="VB.NET" CaseInsensitive="true" Known="VBNET" StartComment="'" TriggersActivators=" .=()">
+    
+    <formats>
+      <format name="Text" Font="Courier New, 10pt" FontColor="Black" />
+      <format name="Whitespace" Font="Courier New, 10pt" FontColor="Black" />
+      <format name="KeyWord" Font="Courier New, 10pt" FontColor="Blue" />
+      <format name="String" Font="Courier New, 10pt" FontColor="Maroon" />
+      <format name="Number" Font="Courier New, 10pt" FontColor="Red" />
+      <format name="Operator" Font="Courier New, 10pt" FontColor="DarkCyan" />
+      <format name="Comment" Font="Courier New, 10pt" FontColor="Green" />
+      <format name="PreprocessorKeyword" Font="Courier New, 10pt" FontColor="Gray" />
+      <format name="SelectedText" Font="Courier New, 10pt" BackColor="Highlight" FontColor="HighlightText" />
+      <format name="CommentXML" Font="Courier New, 10pt" FontColor="Gray" />
+      <format name="CollapsedText" Font="Courier New, 10pt" FontColor="Black" BackColor="White" ForeColor="Gray" />
+    </formats>
+      
+    <extensions>  
+      <extension>vb</extension>
+    </extensions>
+
+    <AutoReplaceTriggers>
+      <AutoReplaceTrigger From="endfunction" To="End Function"/>
+      <AutoReplaceTrigger From="endif" To="End If"/>
+      <AutoReplaceTrigger From="endsub" To="End Sub"/>      
+    </AutoReplaceTriggers>
+
+    <lexems>
+
+      <lexem BeginBlock="=" Type="Operator" />
+      <lexem BeginBlock="+" Type="Operator" />
+      <lexem BeginBlock="-" Type="Operator" />
+      <lexem BeginBlock="/" Type="Operator" />
+      <lexem BeginBlock="*" Type="Operator" />
+      <lexem BeginBlock=";" Type="Operator" />
+      <lexem BeginBlock=":" Type="Operator" />
+      <lexem BeginBlock="." Type="Operator" />
+      <lexem BeginBlock="," Type="Operator" />
+      <lexem BeginBlock="^" Type="Operator" />
+      <lexem BeginBlock="&lt;" EndBlock="&gt;" Type="Operator" IsComplex="true" />
+
+      <lexem BeginBlock="\'|REM" EndBlock="\n" IsBeginRegex="true" IsEndRegex="true" Type="Comment"	OnlyLocalSublexems="true" IsComplex="true" />
+      <lexem BeginBlock='"' ContinueBlock=".*" EndBlock='"' IsContinueRegex="true" Type="String" OnlyLocalSublexems="true" IsComplex="true" />
+      <lexem BeginBlock="[0-9]+" IsBeginRegex="true" Type="Number" />
+      <lexem BeginBlock="&amp;" EndBlock="^H[0-9a-fA-F]+$" IsEndRegex="true" Type="Number" />
+      <lexem BeginBlock="(\s(?&lt;!\n))+" IsBeginRegex="true" Type="Whitespace" />
+                
+      <lexem BeginBlock="AddHandler" Type="KeyWord" /> 
+      <lexem BeginBlock="AddressOf" Type="KeyWord" /> 
+      <lexem BeginBlock="Alias" Type="KeyWord" /> 
+      <lexem BeginBlock="And" Type="KeyWord" /> 
+      <lexem BeginBlock="AndAlso" Type="KeyWord" /> 
+      <lexem BeginBlock="Ansi" Type="KeyWord" /> 
+      <lexem BeginBlock="As" Type="KeyWord" /> 
+      <lexem BeginBlock="Assembly" Type="KeyWord" />
+      <lexem BeginBlock="Async" Type="KeyWord" />
+      <lexem BeginBlock="Auto" Type="KeyWord" />
+      <lexem BeginBlock="Await" Type="KeyWord" />
+      <lexem BeginBlock="Boolean" Type="KeyWord" /> 
+      <lexem BeginBlock="ByRef" Type="KeyWord" /> 
+      <lexem BeginBlock="Byte" Type="KeyWord" /> 
+      <lexem BeginBlock="" Type="KeyWord" /> 
+      <lexem BeginBlock="Call" Type="KeyWord" /> 
+      <lexem BeginBlock="CBool" Type="KeyWord" /> 
+      <lexem BeginBlock="CByte" Type="KeyWord" /> 
+      <lexem BeginBlock="CChar" Type="KeyWord" /> 
+      <lexem BeginBlock="CDate" Type="KeyWord" /> 
+      <lexem BeginBlock="CDbl" Type="KeyWord" /> 
+      <lexem BeginBlock="CDec" Type="KeyWord" /> 
+      <lexem BeginBlock="Char" Type="KeyWord" /> 
+      <lexem BeginBlock="CInt" Type="KeyWord" /> 
+      <lexem BeginBlock="CLng" Type="KeyWord" /> 
+      <lexem BeginBlock="CObj" Type="KeyWord" /> 
+      <lexem BeginBlock="Const" Type="KeyWord" />
+      <lexem BeginBlock="Continue Do" Type="KeyWord" />
+      <lexem BeginBlock="Continue For" Type="KeyWord" />
+      <lexem BeginBlock="Continue While" Type="KeyWord" />      
+      <lexem BeginBlock="CShort" Type="KeyWord" /> 
+      <lexem BeginBlock="CSng" Type="KeyWord" /> 
+      <lexem BeginBlock="CStr" Type="KeyWord" /> 
+      <lexem BeginBlock="CType" Type="KeyWord" /> 
+      <lexem BeginBlock="Date" Type="KeyWord" /> 
+      <lexem BeginBlock="Decimal" Type="KeyWord" /> 
+      <lexem BeginBlock="Declare" Type="KeyWord" /> 
+      <lexem BeginBlock="Default" Type="KeyWord" /> 
+      <lexem BeginBlock="Delegate" Type="KeyWord" /> 
+      <lexem BeginBlock="Dim" Type="KeyWord" /> 
+      <lexem BeginBlock="DirectCast" Type="KeyWord" /> 
+      <lexem BeginBlock="Do" Type="KeyWord" /> 
+      <lexem BeginBlock="Double" Type="KeyWord" /> 
+      <lexem BeginBlock="Each" Type="KeyWord" /> 
+      <lexem BeginBlock="Enum" Type="KeyWord" /> 
+      <lexem BeginBlock="Erase" Type="KeyWord" /> 
+      <lexem BeginBlock="Error" Type="KeyWord" /> 
+      <lexem BeginBlock="Event" Type="KeyWord" />
+      <lexem BeginBlock="Exit Do" Type="KeyWord" />
+      <lexem BeginBlock="Exit For" Type="KeyWord" />
+      <lexem BeginBlock="Exit Function" Type="KeyWord" />
+      <lexem BeginBlock="Exit Sub" Type="KeyWord" />
+      <lexem BeginBlock="Exit While" Type="KeyWord" />      
+      <lexem BeginBlock="False" Type="KeyWord" /> 
+      <lexem BeginBlock="Friend" Type="KeyWord" />
+      <lexem BeginBlock="From" Type="KeyWord" />
+      <lexem BeginBlock="GetType" Type="KeyWord" /> 
+      <lexem BeginBlock="GoSub" Type="KeyWord" /> 
+      <lexem BeginBlock="GoTo" Type="KeyWord" /> 
+      <lexem BeginBlock="Handles" Type="KeyWord" /> 
+      <lexem BeginBlock="Implements" Type="KeyWord" /> 
+      <lexem BeginBlock="Imports" Type="KeyWord" /> 
+      <lexem BeginBlock="In" Type="KeyWord" /> 
+      <lexem BeginBlock="Inherits" Type="KeyWord" /> 
+      <lexem BeginBlock="Integer" Type="KeyWord" /> 
+      <lexem BeginBlock="Interface" Type="KeyWord" /> 
+      <lexem BeginBlock="Is" Type="KeyWord" />
+      <lexem BeginBlock="IsNot" Type="KeyWord" />
+      <lexem BeginBlock="Let" Type="KeyWord" /> 
+      <lexem BeginBlock="Lib" Type="KeyWord" /> 
+      <lexem BeginBlock="Like" Type="KeyWord" /> 
+      <lexem BeginBlock="Long" Type="KeyWord" /> 
+      <lexem BeginBlock="Loop" Type="KeyWord" /> 
+      <lexem BeginBlock="Me" Type="KeyWord" /> 
+      <lexem BeginBlock="Mod" Type="KeyWord" /> 
+      <lexem BeginBlock="MustInherit" Type="KeyWord" /> 
+      <lexem BeginBlock="MustOverride" Type="KeyWord" /> 
+      <lexem BeginBlock="MyBase" Type="KeyWord" /> 
+      <lexem BeginBlock="MyClass" Type="KeyWord" /> 
+      <lexem BeginBlock="New" Type="KeyWord" /> 
+      <lexem BeginBlock="Not" Type="KeyWord" /> 
+      <lexem BeginBlock="Nothing" Type="KeyWord" /> 
+      <lexem BeginBlock="NotInheritable" Type="KeyWord" /> 
+      <lexem BeginBlock="NotOverridable" Type="KeyWord" /> 
+      <lexem BeginBlock="Object" Type="KeyWord" />
+      <lexem BeginBlock="Of" Type="KeyWord" />
+      <lexem BeginBlock="On" Type="KeyWord" /> 
+      <lexem BeginBlock="Option" Type="KeyWord" /> 
+      <lexem BeginBlock="Optional" Type="KeyWord" /> 
+      <lexem BeginBlock="Or" Type="KeyWord" /> 
+      <lexem BeginBlock="OrElse" Type="KeyWord" /> 
+      <lexem BeginBlock="Overloads" Type="KeyWord" /> 
+      <lexem BeginBlock="Overridable" Type="KeyWord" /> 
+      <lexem BeginBlock="Overrides" Type="KeyWord" /> 
+      <lexem BeginBlock="ParamArray" Type="KeyWord" /> 
+      <lexem BeginBlock="Preserve" Type="KeyWord" /> 
+      <lexem BeginBlock="Private" Type="KeyWord" /> 
+      <lexem BeginBlock="Protected" Type="KeyWord" /> 
+      <lexem BeginBlock="Public" Type="KeyWord" /> 
+      <lexem BeginBlock="RaiseEvent" Type="KeyWord" /> 
+      <lexem BeginBlock="ReadOnly" Type="KeyWord" /> 
+      <lexem BeginBlock="ReDim" Type="KeyWord" /> 
+      <lexem BeginBlock="RemoveHandler" Type="KeyWord" /> 
+      <lexem BeginBlock="Resume" Type="KeyWord" /> 
+      <lexem BeginBlock="Return" Type="KeyWord" /> 
+      <lexem BeginBlock="Shadows" Type="KeyWord" /> 
+      <lexem BeginBlock="Shared" Type="KeyWord" /> 
+      <lexem BeginBlock="Short" Type="KeyWord" /> 
+      <lexem BeginBlock="Single" Type="KeyWord" /> 
+      <lexem BeginBlock="Static" Type="KeyWord" /> 
+      <lexem BeginBlock="Step" Type="KeyWord" /> 
+      <lexem BeginBlock="Stop" Type="KeyWord" /> 
+      <lexem BeginBlock="String" Type="KeyWord" /> 
+      <lexem BeginBlock="Structure" Type="KeyWord" /> 
+      <lexem BeginBlock="SyncLock" Type="KeyWord" /> 
+      <lexem BeginBlock="Then" Type="KeyWord" /> 
+      <lexem BeginBlock="Throw" Type="KeyWord" /> 
+      <lexem BeginBlock="To" Type="KeyWord" /> 
+      <lexem BeginBlock="True" Type="KeyWord" /> 
+      <lexem BeginBlock="TypeOf" Type="KeyWord" /> 
+      <lexem BeginBlock="Unicode" Type="KeyWord" /> 
+      <lexem BeginBlock="Until" Type="KeyWord" /> 
+      <lexem BeginBlock="Variant" Type="KeyWord" /> 
+      <lexem BeginBlock="When" Type="KeyWord" /> 
+      <lexem BeginBlock="While" Type="KeyWord" /> 
+      <lexem BeginBlock="WithEvents" Type="KeyWord" /> 
+      <lexem BeginBlock="WriteOnly" Type="KeyWord" /> 
+      <lexem BeginBlock="Xor" Type="KeyWord" />
+     
+      <!-- these were in the original but I see no use for them in VB.NET
+      <lexem BeginBlock="begin" EndBlock="end" Type="KeyWord" IsComplex="true" IsCollapsable="true" CollapseName="begin..end">
+        <SubLexems>
+          <lexem BeginBlock="\n" IsBeginRegex="true" />
+          <lexem ID="777" Priority="2" BeginBlock="[&lt;&gt;]" Type="Operator" IsBeginRegex="true" />
+        </SubLexems>
+      </lexem>
+
+      <lexem BeginBlock="(" EndBlock=")" Type="Operator" IsComplex="true" IsCollapsable="false"	DropContextPrompt="true" CollapseName="(...)">
+        <References>
+          <reference RefID="777" />
+        </References>
+        <SubLexems>
+          <lexem BeginBlock="\n" IsBeginRegex="true" />
+        </SubLexems>
+      </lexem>       
+      -->
+
+      <lexem BeginBlock="Try" EndBlock="Catch|Finally|End Try" IsEndRegex="true" Type="KeyWord" Indent="true" IsComplex="true" IsCollapsable="true"	CollapseName="{Try...End Try}">
+        <SubLexems>
+          <lexem BeginBlock="Catch" IsBeginRegex="true" Type="KeyWord" Indent="true"/>
+          <lexem BeginBlock="Finally" IsBeginRegex="true" Type="KeyWord" Indent="true"/>
+          <lexem BeginBlock="\n" IsBeginRegex="true" />
+        </SubLexems>
+      </lexem>
+
+      <lexem BeginBlock="If" EndBlock="ElseIf|Else|End If" IsEndRegex="true" Type="KeyWord" Indent="true" IsComplex="true" IsCollapsable="true"	CollapseName="{If...End If}">
+        <SubLexems>
+          <lexem BeginBlock="ElseIf" IsBeginRegex="true" Type="KeyWord" Indent="true"/>
+          <lexem BeginBlock="Else" IsBeginRegex="true" Type="KeyWord" Indent="true"/>
+          <lexem BeginBlock="\n" IsBeginRegex="true" />
+        </SubLexems>
+      </lexem>
+
+      <lexem BeginBlock="Select Case" EndBlock="End Select" IsEndRegex="true" Type="KeyWord" Indent="true" IsComplex="true" IsCollapsable="true" CollapseName="{Select Case...End Select}">
+        <SubLexems>
+          <lexem BeginBlock="Case" Type="KeyWord" Indent="true" />
+          <lexem BeginBlock="Case Else" Type="KeyWord" Indent="true" />
+          <lexem BeginBlock="\n" IsBeginRegex="true" />
+        </SubLexems>
+      </lexem>
+
+      <lexem BeginBlock="For" EndBlock="Next" IsEndRegex="true" Type="KeyWord" Indent="true" IsComplex="true" IsCollapsable="true" CollapseName="{For...Next}">
+        <SubLexems>
+          <lexem BeginBlock="\n" IsBeginRegex="true" />
+        </SubLexems>
+      </lexem>
+
+      <lexem BeginBlock="With" EndBlock="End With" IsEndRegex="true" Type="KeyWord" Indent="true" IsComplex="true" IsCollapsable="true" CollapseName="{With...End With}">
+        <SubLexems>
+            <lexem BeginBlock="\n" IsBeginRegex="true" />
+        </SubLexems>
+      </lexem>
+
+      <lexem BeginBlock="Property" EndBlock="End Property" IsEndRegex="true" Type="KeyWord"	Indent="true" IsComplex="true" IsCollapsable="true" CollapseName="{Property...End Property}" AutoNameExpression='.*Property.*\s+(?&lt;text>\w+)\s*'	AutoNameTemplate="Property ${text} ..." IsCollapseAutoNamed="true" ContentDivider="false">
+        <SubLexems>
+          <lexem BeginBlock="Get" EndBlock="End Get" IsEndRegex="true" Type="KeyWord"	Indent="true" IsComplex="true" />
+          <lexem BeginBlock="Set" EndBlock="End Set" IsEndRegex="true" Type="KeyWord"	Indent="true" IsComplex="true" />
+          <lexem BeginBlock="\n" IsBeginRegex="true" />
+        </SubLexems>
+      </lexem>
+
+      <lexem BeginBlock="Sub" EndBlock="End Sub" IsEndRegex="true" Type="KeyWord"	Indent="true" IsComplex="true" IsCollapsable="true" CollapseName="{Sub...End Sub}" AutoNameExpression='.*Sub.*\s+(?&lt;text>\w+)\s*'	AutoNameTemplate="Sub ${text} ..." IsCollapseAutoNamed="true" ContentDivider="false">
+        <SubLexems>
+          <lexem BeginBlock="\n" IsBeginRegex="true" />
+        </SubLexems>
+      </lexem>
+
+      <lexem BeginBlock="Function" EndBlock="End Function" IsEndRegex="true" Type="KeyWord"	Indent="true" IsComplex="true" IsCollapsable="true" CollapseName="{Function...End Function}" AutoNameExpression='.*Function.*\s+(?&lt;text>\w+)\s*'	AutoNameTemplate="Function ${text} ..." IsCollapseAutoNamed="true" ContentDivider="false">
+        <SubLexems>
+          <lexem BeginBlock="\n" IsBeginRegex="true" />
+        </SubLexems>
+      </lexem>
+
+      <lexem BeginBlock="Class" EndBlock="End Class" IsEndRegex="true" Type="KeyWord"	Indent="true" IsComplex="true" IsCollapsable="true" CollapseName="{Class...End Class}" AutoNameExpression='.*Class.*\s+(?&lt;text>\w+)\s*'	AutoNameTemplate="Class ${text} ..." IsCollapseAutoNamed="true" ContentDivider="false">
+        <SubLexems>
+          <lexem BeginBlock="\n" IsBeginRegex="true" />
+        </SubLexems>
+      </lexem>
+
+      <lexem BeginBlock="Module" EndBlock="End Module" IsEndRegex="true" Type="KeyWord"	Indent="true" IsComplex="true" IsCollapsable="true" CollapseName="{Module...End Module}" AutoNameExpression='.*Module.*\s+(?&lt;text>\w+)\s*'	AutoNameTemplate="Module ${text} ..." IsCollapseAutoNamed="true" ContentDivider="false">
+        <SubLexems>
+          <lexem BeginBlock="\n" IsBeginRegex="true" />
+        </SubLexems>
+      </lexem>
+
+      <lexem BeginBlock="Namespace" EndBlock="End Namespace" IsEndRegex="true" Type="KeyWord"	Indent="true" IsComplex="true" IsCollapsable="true" CollapseName="{Namespace...End Namespace}" AutoNameExpression='.*Namespace.*\s+(?&lt;text>\w+)\s*'	AutoNameTemplate="Namespace ${text} ..." IsCollapseAutoNamed="true" ContentDivider="false">
+        <SubLexems>
+          <lexem BeginBlock="\n" IsBeginRegex="true" />
+        </SubLexems>
+      </lexem>
+
+      <lexem BeginBlock="#Region" EndBlock="#End Region" IsEndRegex="false" Type="PreprocessorKeyword" IsComplex="true" IsCollapsable="true" CollapseName="{#Region...#End Region}" AutoNameExpression='(#Region)\s*"(?&lt;text>.*)".*(?&lt;!\n)\n' AutoNameTemplate="#Region ${text} ..." IsCollapseAutoNamed="true" ContentDivider="false">
+        <SubLexems>
+          <lexem BeginBlock="\n" IsBeginRegex="true" />
+        </SubLexems>
+      </lexem>
+      
+    </lexems>
+
+    <splits><!--treats two or more words as one token-->
+      <split>@&quot;</split>
+      <split>(*</split>
+      <split>*)</split>
+      <split>//</split>
+      <split>'</split>
+      <split>///</split>
+      <split>#Region</split>
+      <split>#End Region</split>
+      <split>Select Case</split>
+      <split>Case Else</split>
+      <split>Continue Do</split>
+      <split>Continue For</split>
+      <split>Continue While</split>
+      <split>End Class</split>
+      <split>End Function</split>
+      <split>End Get</split>
+      <split>End If</split>
+      <split>End Module</split>
+      <split>End Namespace</split>
+      <split>End Property</split>
+      <split>End Select</split>
+      <split>End Set</split>
+      <split>End Sub</split>
+      <split>End Try</split>
+      <split>End With</split>   
+      <split>Exit Do</split>
+      <split>Exit For</split>
+      <split>Exit Function</split>
+      <split>Exit Sub</split>
+      <split>Exit While</split>
+    </splits>
+  
+  </ConfigLanguage>  
+</ArrayOfConfigLanguage>

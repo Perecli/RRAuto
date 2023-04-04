@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="CustomControls.ContScriptEditor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:wfi="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
+    xmlns:RRAuto="clr-namespace:RRAuto.CustomControls">
+    <wfi:WindowsFormsHost x:Name="FormsHost">
+        <!--
+        for some unexplained reason when the CodeEditor instance is created here CodeEditor.FormatKeyWord event handler is not called;
+        so instead I create this instance in the code behind which seems to work fine
+        <RRAuto:CodeEditor x:Name="ScriptBoxItem" />
+        -->       
+    </wfi:WindowsFormsHost>         
+</UserControl>

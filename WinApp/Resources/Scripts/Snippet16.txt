@@ -1,0 +1,13 @@
+﻿'Get a script reference since we will be using it multiple times
+Dim objScript as StepScript = CtcStepScript("ScriptName")
+
+'Starts a step script from the beginning
+'Await is optional if you want to wait for it to complete
+'before executing the next line
+Await objScript.StartAt(0)
+
+'The script can later be stopped from this or other scripts
+objScript.Stop()
+
+'Assuming the script is stopped, resume from last location
+Await objScript.StartAt(objScript.StepPos)

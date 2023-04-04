@@ -1,0 +1,6 @@
+'Set the state of the track and optionally wait for the outcome
+If Await CtcTurnout("TurnoutName").SetState("Diverging") Then
+	'Do stuff if setting the state succeeded
+Else
+	'Do stuff if setting the state failed (possibly due to a lock)
+End If

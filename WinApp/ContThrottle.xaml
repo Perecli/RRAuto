@@ -1,0 +1,149 @@
+﻿<UserControl x:Class="CustomControls.ContThrottle"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:RRAuto="clr-namespace:RRAuto.CustomControls">
+    <Grid>
+        <ToolBar Height="27" Name="ToolBarTop" VerticalAlignment="Top">
+            <Button Name="BtnBind" Click="BtnBind_Click" Focusable="false">
+                <Image Name="ImgBind" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}"/>
+            </Button>
+            <Separator/>
+            <Button Name="BtnRampType" ToolTip="Speed Step Curve" Focusable="false" PreviewMouseDown="BtnRampType_PreviewMouseDown">
+                <StackPanel Orientation="Horizontal">
+                    <Image Name="BtnRampTypeImg" Source="{StaticResource IconAccel1}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+                    <Image Source="{StaticResource DropDown}" Height="4" Margin="5,0,0,0" Style="{StaticResource ButtonImageStyle}" />
+                </StackPanel>
+                <Button.Resources>
+                    <ResourceDictionary>
+                        <ContextMenu x:Key="RampTypeMenu" Placement="Bottom">
+                            <MenuItem Header="Linear" InputGestureText="(F2)" Click="RampType_Click" Tag="Linear">
+                                <MenuItem.Icon>
+                                    <Image Source="{StaticResource IconAccel1}" Width="16" Height="16" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Progressive Lite" InputGestureText="(F3)" Click="RampType_Click" Tag="ExpLow">
+                                <MenuItem.Icon>
+                                    <Image Source="{StaticResource IconAccel2}" Width="16" Height="16" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="Progressive Full" InputGestureText="(F4)" Click="RampType_Click" Tag="ExpHigh">
+                                <MenuItem.Icon>
+                                    <Image Source="{StaticResource IconAccel3}" Width="16" Height="16" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </ResourceDictionary>
+                </Button.Resources>
+            </Button>
+            <Separator/>
+            <Button Name="BtnEStop" ToolTip="Emergency Stop (Esc)" Click="BtnEStop_Click" Focusable="false">
+                <Image Source="{StaticResource IconEStop}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}"/>
+            </Button>
+            <Button Name="BtnDir" Focusable="false" Click="BtnDir_Click">
+                <Image Name="ImgDir" Source="{StaticResource IconForward}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}"/>
+            </Button>           
+        </ToolBar>
+        
+        <GroupBox Name="GroupBoxKnob" Header="Speed Control" Margin="8,29,8,35">
+            <Grid>
+                <RRAuto:Knob x:Name="SpeedKnob" />
+                <Label Name="Speed" Background="#7DFFFFFF" Padding="4,0,4,1" HorizontalContentAlignment="Right" VerticalAlignment="Bottom" HorizontalAlignment="Left" FontWeight="SemiBold" FontSize="13" Width="41">0%</Label>
+            </Grid>
+        </GroupBox>
+        
+        <ToolBar Height="27" Name="ToolBarBottom" VerticalAlignment="Bottom">
+            <ToggleButton Name="BtnF0" ToolTip="Lights (D0)" Focusable="false" Tag="0" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconHeadlight}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <Separator/>
+            <ToggleButton Name="BtnF1" ToolTip="Whistle (D1)" Focusable="false" Tag="1" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconBell}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF2" ToolTip="Function 2 (D2)" Focusable="false" Tag="2" PreviewMouseLeftButtonDown="BtnFunc_PreviewMouseLeftButtonDown" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconHorn}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF3" ToolTip="Function 3 (D3)" Focusable="false" Tag="3" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc3}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF4" ToolTip="Function 4 (D4)" Focusable="false" Tag="4" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc4}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <Separator/>
+            <ToggleButton Name="BtnF5" ToolTip="Function 5 (D5)" Focusable="false" Tag="5" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc5}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF6" ToolTip="Function 6 (D6)" Focusable="false" Tag="6" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc6}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF7" ToolTip="Function 7 (D7)" Focusable="false" Tag="7" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc7}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF8" ToolTip="Function 8 (D8)" Focusable="false" Tag="8" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc8}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <Separator/>
+            <ToggleButton Name="BtnF9" ToolTip="Function 9" Focusable="false" Tag="9" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc9}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF10" ToolTip="Function 10" Focusable="false" Tag="10" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc10}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF11" ToolTip="Function 11" Focusable="false" Tag="11" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc11}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF12" ToolTip="Function 12" Focusable="false" Tag="12" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc12}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <Separator/>
+            <ToggleButton Name="BtnF13" ToolTip="Function 13" Focusable="false" Tag="13" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc13}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF14" ToolTip="Function 14" Focusable="false" Tag="14" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc14}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF15" ToolTip="Function 15" Focusable="false" Tag="15" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc15}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF16" ToolTip="Function 16" Focusable="false" Tag="16" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc16}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF17" ToolTip="Function 17" Focusable="false" Tag="17" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc17}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF18" ToolTip="Function 18" Focusable="false" Tag="18" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc18}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF19" ToolTip="Function 19" Focusable="false" Tag="19" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc19}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF20" ToolTip="Function 20" Focusable="false" Tag="20" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc20}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <Separator/>
+            <ToggleButton Name="BtnF21" ToolTip="Function 21" Focusable="false" Tag="21" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc21}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF22" ToolTip="Function 22" Focusable="false" Tag="22" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc22}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF23" ToolTip="Function 23" Focusable="false" Tag="23" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc23}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF24" ToolTip="Function 24" Focusable="false" Tag="24" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc24}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF25" ToolTip="Function 25" Focusable="false" Tag="25" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc25}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF26" ToolTip="Function 26" Focusable="false" Tag="26" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc26}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF27" ToolTip="Function 27" Focusable="false" Tag="27" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc27}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+            <ToggleButton Name="BtnF28" ToolTip="Function 28" Focusable="false" Tag="28" Click="BtnFunc_Click">
+                <Image Source="{StaticResource IconFunc28}" Width="16" Height="16" Style="{StaticResource ButtonImageStyle}" />
+            </ToggleButton>
+        </ToolBar>
+    </Grid> 
+</UserControl>

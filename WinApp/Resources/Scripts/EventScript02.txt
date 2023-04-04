@@ -1,0 +1,10 @@
+'Prevents a route from being unlocked when a sensor is occupied 
+'The assumption here is that a route's 'BeforeUnlock' event was bound to this script object
+
+Dim objSensor As Sensor = CtcSensor("SensorName")
+If objSensor.State = 1 Then
+	'when an attempt is made to unlock the bound route, this cancels that operation
+	e.Cancel()
+
+	PostMsg("[{0}] could not be unlocked because [{1}] is occupied.", e.Sender, objSensor)
+End If

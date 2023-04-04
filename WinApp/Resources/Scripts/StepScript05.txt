@@ -1,0 +1,7 @@
+﻿'The cancel token, provided by the step script (o)bject, can be passed into any
+'long running task, that accepts a cancellation token, so that it can be aborted
+'immediately and gracefully when the step script is given a stop order.
+o.Step("StepName", Function()
+	PostMsg("Starting long running task")
+	Return Delay(100000, o.CancelToken)
+End Function)

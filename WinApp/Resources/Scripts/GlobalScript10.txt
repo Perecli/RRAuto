@@ -1,0 +1,2 @@
+﻿'Provides a global variable bag indexed by name
+Public Property Var as New VariableBag

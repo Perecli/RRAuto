@@ -1,0 +1,52 @@
+﻿<ListView x:Class="CustomControls.ContSlots"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+        Foreground="Black">
+
+    <ListView.View>
+        <GridView>
+            
+            <GridView.ColumnHeaderContainerStyle>
+                <Style>
+                    <Setter Property="ListView.HorizontalContentAlignment" Value="Left"/>
+                    <Setter Property="ListView.Padding" Value="5, 0, 5, 0" />
+                </Style>
+            </GridView.ColumnHeaderContainerStyle>
+            
+            <GridViewColumn Width="35" Header="Slot" DisplayMemberBinding="{Binding Slot}" />
+            <GridViewColumn Width="40" Header="Adr." DisplayMemberBinding="{Binding Address}" />
+            <GridViewColumn Width="35" Header="Spd." DisplayMemberBinding="{Binding Speed}" />
+            
+            <GridViewColumn Header="Dir.">
+                <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding Direction}" Width="16" Height="16" />                                                
+                    </DataTemplate>
+                </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+
+            <GridViewColumn Header="Functions (0-8)">
+                <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding Func0}" Width="16" Height="16" Margin="0,0,0,0" />
+                            <Image Source="{Binding Func1}" Width="16" Height="16" Margin="6,0,0,0" />
+                            <Image Source="{Binding Func2}" Width="16" Height="16" Margin="1,0,0,0" />
+                            <Image Source="{Binding Func3}" Width="16" Height="16" Margin="1,0,0,0" />
+                            <Image Source="{Binding Func4}" Width="16" Height="16" Margin="1,0,0,0" />
+                            <Image Source="{Binding Func5}" Width="16" Height="16" Margin="6,0,0,0" />
+                            <Image Source="{Binding Func6}" Width="16" Height="16" Margin="1,0,0,0" />
+                            <Image Source="{Binding Func7}" Width="16" Height="16" Margin="1,0,0,0" />
+                            <Image Source="{Binding Func8}" Width="16" Height="16" Margin="1,0,0,0" />                            
+                        </StackPanel>
+                    </DataTemplate>
+                </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+
+            <GridViewColumn Width="60" Header="Activity" DisplayMemberBinding="{Binding Activity}" />
+            <GridViewColumn Width="100" Header="Spd. Stp." DisplayMemberBinding="{Binding SpeedSteps}" />
+            <GridViewColumn Width="75" Header="Consist" DisplayMemberBinding="{Binding Consist}" />
+            
+        </GridView>
+    </ListView.View>
+</ListView>

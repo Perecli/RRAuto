@@ -1,0 +1,12 @@
+'Get a sequence reference since we will be using it multiple times
+Dim objSequence As Sequence = CtcSequence("SequenceName")
+
+'The Play() method returns immediately spawning a new thread
+If objSequence.Play() then
+	PostMsg("Sequence is now playing.")
+Else
+	PostMsg("Sequence is already playing or recording.")
+End If
+
+'The sequence can later be stopped from this or other scripts
+objSequence.Stop()

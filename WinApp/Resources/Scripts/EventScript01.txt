@@ -1,0 +1,11 @@
+'Sets a signal based on the state of a given turnout
+'The assumption here is that a turnout's event was bound to this script object
+'A reference to that turnout will be passed to "e.Sender" when its bound event is raised 
+
+Dim objTrack As Track = e.Sender
+Dim objSignal as Signal = CtcSignal("SignalName")
+If objTrack.State.Value = Track.TrackState.Diverging Then
+	objSignal.SetAspect("Caution")
+else
+	objSignal.SetAspect("Clear")	
+End If

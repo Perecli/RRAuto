@@ -1,0 +1,16 @@
+'Get an engine reference since we will be using it multiple times
+Dim objEngine As Engine = CtcBoundEngine("EngineName")
+
+'If the given engine is not bound to a slot, an error will be reported
+'You can set the engine's AutoBindInOpr property to True so binding occurs 
+'automaticaly when entering operation mode
+
+'Set the engine's direction forward
+objEngine.Direction = LocoDirection.Forward
+
+'Turn on the engine's lights 
+objEngine.Functions(0) = 1
+
+'Start a smooth speed ramp from the current speed to a target speed of 50
+'thicking one speed step closer to the target speed every 100 milliseconds
+Await objEngine.StartSpeedRamp(50, 100)  'Spawns a new async thread so it returns immediately if not awaited

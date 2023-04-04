@@ -1,0 +1,289 @@
+﻿<html>
+    <head>
+        <title>Speech Gammar Help</title>
+        <style type="text/css">
+            body {
+	            margin: 0px;
+	            padding: 10px;
+            }
+            .Title{
+				color: #000080;
+				font-weight: bold;
+				font-size: 15px;
+				font-family: Arial;
+				padding-left: 2;
+				padding-right: 2;
+				font-style: italic;
+				margin-bottom: 3;
+			}
+			.Speech	{
+				color: red;
+	            font-weight: normal;
+	            font-size: 13px;
+	            font-family: 'Courier New';	
+	            background-color:#F5F8FA;
+	            padding-left: 2;
+	            padding-right: 2;
+			}
+			.Name {
+				color: green;
+	            font-weight: normal;
+	            font-size: 13px;
+	            font-family: 'Courier New';	
+			}
+			.Description {
+			    font-weight: normal;
+				font-size: 11px;
+				color: black;
+				font-family: verdana, geneva, arial, sans-serif;
+				background-color: #F5F8FA;
+				padding-left: 12;	
+				padding-right: 2;
+				padding-bottom: 2;
+				margin-bottom: 3;		
+			}
+			.Text {
+			    font-weight: normal;
+				font-size: 11px;
+				color: black;
+				font-family: verdana, geneva, arial, sans-serif;	
+			}
+
+		</style>
+    </head>
+    <body>
+        <div class="Title">
+            General Commands
+        </div>
+        
+	    <div class="Speech">
+	        hello
+	    </div>
+	    <div class="Description">
+	        tests command recognition and confirmation
+	    </div> 
+	        
+	    <div class="Speech">
+	        {stop/start} listening
+	    </div>
+	    <div class="Description">
+	        pauses/un-pauses speech recognition (service must be started)
+	    </div> 
+	
+	    <div class="Speech">
+	        speech grammar
+	    </div>
+	    <div class="Description">
+	        shows/hides this speech grammar help window
+	    </div>   
+	        
+	    <div class="Speech">
+	        slot status
+	    </div>
+	    <div class="Description">
+	        shows/hides the slot status window
+	    </div> 
+	                
+	    <div class="Speech">
+	        toggle network connection
+	    </div>
+	    <div class="Description">
+	        toggles between connect/disconnect to/from Loconet network
+	    </div>    
+	
+	    <div class="Speech">
+	        toggle track power
+	    </div>
+	    <div class="Description">
+	        toggles between powering the track on/off
+	    </div>             
+
+	    <div class="Speech">
+	        broadcast states
+	    </div>
+	    <div class="Description">
+	        sends packets to the network to synchronize devices to the states held by the application
+	    </div>     
+	
+	    <div class="Speech">
+	        query sensors
+	    </div>
+	    <div class="Description">
+	        sends a request to the network for input devices to broadcast their states to the application
+	    </div> 
+	        
+        <div class="Title" style="margin-top:10;">
+            Object Commands
+        </div>      
+     
+	    <!--
+	    <div class="Speech">
+	        all stop
+	    </div>
+	    <div class="Description">
+	        stops railroad (all engines)
+	    </div>      
+	    -->
+	    <div class="Speech">
+	        set turnout <span class="Name">{TrackName}</span> [to] <span class="Name">{StateName}</span>
+	    </div>
+	    <div class="Description">
+	        sets the state of the named turnout
+	    </div>      
+	        
+	    <div class="Speech">
+	        set route <span class="Name">{RouteName}</span>
+	    </div>
+	    <div class="Description">
+	        sets the turnout states of the named route, if no locking conflict exists, but does not lock the route
+        </div>   
+            
+	    <div class="Speech">
+	        lock route <span class="Name">{RouteName}</span>
+	    </div>
+	    <div class="Description">
+	        sets the turnout states of the named route, if no locking conflict exists, and locks the route	            
+        </div>  
+            
+	    <div class="Speech">
+	        unlock route <span class="Name">{RouteName}</span>
+	    </div>
+	    <div class="Description">
+	        unlocks the named route, if route has been previously locked	            
+        </div>                          
+	        
+	    <div class="Speech">
+	        set signal <span class="Name">{SignalName}</span> [to] <span class="Name">{AspectName}</span>
+	    </div>
+	    <div class="Description">
+	        sets the aspect of the named signal
+	    </div>
+	        
+	    <!--
+	    <div class="Speech">
+	        set accessory <span class="Name">{AccessoryName}</span> [to] <span class="Name">{StateName}</span>
+	    </div>
+	    <div class="Description">
+	        sets the state of a named accessory
+	    </div>   
+	    -->
+        
+	    <div class="Speech">
+	        control engine <span class="Name">{EngineName}</span>
+	    </div>
+	    <div class="Description">
+	        sets the context engine that all throttle commands will be directed towards
+	    </div>    
+	        
+	    <div class="Speech">
+	        get current engine
+	    </div>
+	    <div class="Description">
+	        causes the context engine name to be returned through voice feedback
+	    </div> 
+	        
+	    <div class="Speech">
+	        release engine control
+	    </div>
+	    <div class="Description">
+	        releases the context engine if one has been previously set
+	    </div>   
+
+        <div class="Speech">
+	        {record/play/stop} sequence <span class="Name">{SequenceName}</span>
+	    </div>
+	    <div class="Description">
+	        records, plays, or stops the named sequence
+	    </div>
+        	                
+	    <div class="Speech">
+	        run script <span class="Name">{ScriptName}</span>
+	    </div>
+	    <div class="Description">
+	        executes the named script
+	    </div>
+	        
+	  	<div class="Title" style="margin-top:10;">
+            Throttle Commands
+        </div>
+	        
+	    <!--
+	    <div class="Speech">
+	        purge engine <span class="Name">{EngineName}</span>
+	    </div>
+	    <div class="Description">
+	        frees the command station's slot that the named engine occupied
+	    </div>  
+        -->
+        
+        <div class="Speech">
+	        set speed [to] {0-100} [percent]
+	    </div>
+	    <div class="Description">
+	        sets the speed, of the context engine, to the given percentage of full throttle
+	    </div>  
+	        
+	    <div class="Speech">
+	        ramp speed [{slow/fast}] [to] {0-100} [percent]
+	    </div>
+	    <div class="Description">
+	        creates a smooth speed transition, on the context engine, from current speed to the given percentage of full throttle
+	    </div> 
+	        
+   	    <div class="Speech">
+	        hold speed
+	    </div>
+	    <div class="Description">
+	        interrupts a speed ramp in progress on the context engine
+	    </div> 
+	        
+	    <div class="Speech">
+	        {increase/decrease} speed [by] {1-50} [steps]
+	    </div>
+	    <div class="Description">
+	        increases/decreases current speed, on the context engine, by the given number of steps
+	    </div> 
+        
+	    <div class="Speech">
+	        e stop
+	    </div>
+	    <div class="Description">
+	        triggers an emergency stop on the context engine
+	    </div>      
+	                
+	    <div class="Speech">
+	        set direction {forward/reverse}
+	    </div>
+	    <div class="Description">
+	        sets the movement direction of the context engine
+	    </div> 
+	        
+	    <div class="Speech">
+	        change direction
+	    </div>
+	    <div class="Description">
+	        sets the movement direction, of the context engine, to the opposite current direction
+	    </div>        
+	       
+	    <div class="Speech">
+	        turn {on/off} lights
+	    </div>
+	    <div class="Description">
+	        turns on/off lights (function 0) on the context engine
+	    </div> 
+	
+	    <div class="Speech">
+	        turn {on/off} function {1-8}
+	    </div>
+	    <div class="Description">
+	        turns on/off functions 1-8 on the context engine
+	    </div> 
+	        
+	    <div class="Speech">
+	        turn off all functions
+	    </div>
+	    <div class="Description">
+	        turns off lights (function 0) and functions 1-8 on the context engine
+	    </div>  
+    </body>
+</html>

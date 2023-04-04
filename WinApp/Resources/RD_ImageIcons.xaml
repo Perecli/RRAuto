@@ -1,0 +1,16 @@
+﻿<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <BitmapImage x:Key="IconNew" UriSource="/Resources/Icons/IconNew.png" />
+    <BitmapImage x:Key="IconOpen" UriSource="/Resources/Icons/IconOpen.png" />
+    <BitmapImage x:Key="IconSave" UriSource="/Resources/Icons/IconSave.png" />
+    <BitmapImage x:Key="IconSaveAs" UriSource="/Resources/Icons/IconSaveAs.png" />
+                              
+    <BitmapImage x:Key="Device" UriSource="/Resources/Icons/device.ico" />
+    <BitmapImage x:Key="Security" UriSource="/Resources/Icons/security.ico" />
+    <BitmapImage x:Key="Find" UriSource="/Resources/Icons/find.ico" />
+                 
+    <BitmapImage x:Key="State" UriSource="/Resources/Icons/state.ico" />
+      
+</ResourceDictionary>

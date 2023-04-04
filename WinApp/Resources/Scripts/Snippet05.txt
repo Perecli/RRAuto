@@ -1,0 +1,6 @@
+'Set the aspect of the signal and optionally wait for the outcome
+If Await CtcSignal("SignalName").SetAspect("Clear") Then
+	'Do stuff if setting the aspect succeeded
+Else
+	'Do stuff if setting the aspect failed
+End If

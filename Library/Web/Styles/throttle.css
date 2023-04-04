@@ -1,0 +1,99 @@
+﻿.TitleBar {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 16px;
+}
+
+.EngineAddr {
+    font-size: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.EngineName {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.EngListPanel {
+    position: absolute;
+    background-color: black;  
+    top: 0px;
+    bottom: 0px;  
+    left: 0px;
+    right: 0px;
+}
+
+
+.MessagePanel {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.7);
+    top: 0px;
+    bottom: 0px;  
+    left: 0px;
+    right: 0px; 
+    overflow: hidden;
+}
+.MessageItem {
+    background-color: #394044;  
+    padding: 20px;
+    font-size: 16px;
+}
+
+
+.Button {	
+	border-radius:5px;
+	background-color: #4C4C4C;	
+    border:2px solid #4C4C4C;
+    cursor: pointer;	    /* on mobile Chrome, this style actually highlights the button for a short time as it is pressed */
+}
+.Button.Red {	
+	background-color:#4C0000;
+    border:1px solid #4C0000;					
+}
+.Button.On {	
+	border:2px solid #c3c3c3;						
+}
+.Button.FlatB {	
+	border-radius:5px 5px 0 0;
+}
+.Button.FlatT {	
+	border-radius:0 0 5px 5px;
+}
+
+
+input[type=text].SpeedNum {  /* more specific to override the base.css */
+    background: transparent; 
+    border: none;
+    height: 24px; 
+    width: 100%;
+    padding: 5px 0;
+    text-align: center;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none;   /* Chrome/Safari/Opera */    
+    -moz-user-select: none;      /* Firefox */
+    -ms-user-select: none;       /* IE/Edge */
+    user-select: none;           /* non-prefixed version, currently not supported by any browser */ 
+    opacity: 1;                  /* iOS changes opacity when element is disabled */ 
+}
+
+.SpeedBar {
+    background-color: #656565;
+}
+.SpeedBar._25 {
+    background-color: #00C800;
+}
+.SpeedBar._50 {
+    background-color: #A9C800;
+}
+.SpeedBar._75 {
+    background-color: #C89D00;
+}
+.SpeedBar._100 {
+    background-color: #C80000;
+}
+
+.SpeedDir {
+    background-color: #323232;    
+}
+

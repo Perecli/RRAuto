@@ -1,0 +1,12 @@
+﻿<UserControl x:Class="CustomControls.ContSwitchboard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:RRAuto="clr-namespace:RRAuto.CustomControls" 
+    ClipToBounds="True">
+    <Grid>
+        <RRAuto:Switchboard x:Name="Switchboard" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+
+        <Image Name="ImgTouchManip" Margin="5,5,0,0" Width="30" Height="30" VerticalAlignment="Top" HorizontalAlignment="Left" />
+        <Rectangle Name="BtnTouchManip" Margin="0,0,0,0" Height="40" Width="40" VerticalAlignment="Top" HorizontalAlignment="Left" Fill="Transparent" />
+    </Grid>     
+</UserControl>

@@ -1,0 +1,4 @@
+<Runtime.CompilerServices.Extension()>
+Public Sub MySubName(obj as TypeBeingExtended)
+	'Enter code here
+End Sub

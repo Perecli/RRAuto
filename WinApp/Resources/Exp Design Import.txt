@@ -1,0 +1,9 @@
+﻿Changes needed after importing Drawings.design from Expressions Design
+----------------------------------------------------------------------
+- Remove all wrappers down to the DrawingGroups and move the name key there: <DrawingGroup x:Key="Name">
+- remove the middle gradient stop from connection drawings 
+
+Changes needed after importing Icons.design from Expressions Design
+----------------------------------------------------------------------
+- convert DrawingBrush to DrawingImage
+- remove Stretch attribute

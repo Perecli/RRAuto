@@ -1,0 +1,17 @@
+﻿'These multi-line steps are not awaited by the caller because they don't return Task objects.
+
+'This step contains nothing that can be awaited.
+o.Step("StepName1", Sub()
+	If CtcSensor("SensorName").State = 1 Then
+		PostMsg("Executing")
+	End If
+End Sub)
+
+'This step contains some internal awaits but the step returns no Task so the caller will not await it.
+'The "Async" declaration is required if any of the containing methods are awaited.
+o.Step("StepName2", Async Sub()
+	Await Delay(1000)
+	PostMsg("Executing 1")
+	Await Delay(1000)
+	PostMsg("Executing 2")
+End Sub)

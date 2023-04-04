@@ -1,0 +1,20 @@
+PostMsg("Script started.")
+
+'Waits for either either "Sensor1" or "Sensor2" to report an 'On' state
+'before continuing to the next line.
+Await OnEvent(New EventsList() FROM {
+	{CtcSensor("Sensor1"), "StateReported"}, 
+	{CtcSensor("Sensor2"), "StateReported"}},
+	Function(ea)
+		'ea.Sender always returns the object that raised the event
+		'In this case it can only be one of the two sensors specified above
+
+		'Check to see if the sensor that raised the event satisfies our condition
+		If ea.Sender.State = 1 Then		
+			'reoccurring events will continue to call this function until
+			'we indicate that the event binding should be disposed
+			ea.Dispose()  
+		End If
+	End Function)
+
+PostMsg("Script continued after our event condition was met.")

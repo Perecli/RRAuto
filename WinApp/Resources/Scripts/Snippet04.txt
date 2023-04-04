@@ -1,0 +1,18 @@
+'Get a turnout reference since we will be using it multiple times
+Dim objTurnout As Track = CtcTurnout("TurnoutName")
+
+'Optionally you can act based on the turnout's type
+'See documentation of all types defined by the Track.TrackType enumeration
+If objTurnout.Type = Track.TrackType.TurnoutDoubleSlip
+
+	'Check the state of the turnout
+	Select Case objTurnout.State.Name
+		Case "Cross1"
+			'Do stuff when turnout is set to Cross1
+		Case "Cross2", "Diverging1"
+			'Do stuff when turnout is set to Cross2 or Diverging1
+		Case Else
+			'Do stuff for all other states
+	End Select
+
+End If

@@ -1,0 +1,2 @@
+'Posts an arbitrary message to the "CTC Events" pane
+PostMsg("Hello world!!")
