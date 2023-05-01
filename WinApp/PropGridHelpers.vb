@@ -19,7 +19,7 @@ Namespace PropertyGridHelpers
             Return True     'needed so GetProperties() function gets called
         End Function
 
-        Public Overloads Overrides Function GetProperties(context As System.ComponentModel.ITypeDescriptorContext,  value As Object,  attributes() As System.Attribute) As System.ComponentModel.PropertyDescriptorCollection
+        Public Overloads Overrides Function GetProperties(context As System.ComponentModel.ITypeDescriptorContext, value As Object, attributes() As System.Attribute) As System.ComponentModel.PropertyDescriptorCollection
             'get the dynamic configuration of the property grid
             Dim objDynamicAttrib As ListDictionary = DirectCast(value, IDynamicPropertyGrid).PropGridDynamicAttrib
 
@@ -62,7 +62,7 @@ Namespace PropertyGridHelpers
         Private _objPropDescSource As PropertyDescriptor
         Private _strDisplayName As String
 
-        Public Sub New(objPropDescSource As PropertyDescriptor,  strDisplayName As String,  objaAttrs() As Attribute)
+        Public Sub New(objPropDescSource As PropertyDescriptor, strDisplayName As String, objaAttrs() As Attribute)
             MyBase.New(objPropDescSource, objaAttrs)
             _objPropDescSource = objPropDescSource
             _strDisplayName = strDisplayName
@@ -82,7 +82,7 @@ Namespace PropertyGridHelpers
             Return _objPropDescSource.GetValue(component)
         End Function
 
-        Public Overrides Sub SetValue(component As Object,  value As Object)
+        Public Overrides Sub SetValue(component As Object, value As Object)
             _objPropDescSource.SetValue(component, value)
         End Sub
 
@@ -132,7 +132,7 @@ Namespace PropertyGridHelpers
             DisplayName = strDisplayName
         End Sub
 
-        Public Sub New(strDisplayName As String,  objaAttributes As Attribute())
+        Public Sub New(strDisplayName As String, objaAttributes As Attribute())
             DisplayName = strDisplayName
             Attributes = objaAttributes
         End Sub
@@ -140,7 +140,7 @@ Namespace PropertyGridHelpers
 
     Public Class DynAttrib
 
-        Public Shared Sub Join(ByRef objAttribs1 As Attribute(),  objAttribs2 As Attribute())
+        Public Shared Sub Join(ByRef objAttribs1 As Attribute(), objAttribs2 As Attribute())
             ReDim Preserve objAttribs1(objAttribs1.Length - 1 + objAttribs2.Length)
             objAttribs2.CopyTo(objAttribs1, objAttribs1.Length - objAttribs2.Length)
         End Sub
@@ -153,7 +153,7 @@ Namespace PropertyGridHelpers
             Join(objAttribs, New Attribute() {New ReadOnlyAttribute(True)})
         End Sub
 
-        Public Shared Sub Description(ByRef objAttribs As Attribute(),  strDesc As String)
+        Public Shared Sub Description(ByRef objAttribs As Attribute(), strDesc As String)
             Join(objAttribs, New Attribute() {New DescriptionAttribute(strDesc)})
         End Sub
 
@@ -205,7 +205,7 @@ Namespace PropertyGridHelpers
         Private Class CtcObjectBaseComparer
             Implements IComparer(Of CtcObjectBase)
 
-            Public Function Compare(x As CtcObjectBase,  y As CtcObjectBase) As Integer Implements IComparer(Of CtcObjectBase).Compare
+            Public Function Compare(x As CtcObjectBase, y As CtcObjectBase) As Integer Implements IComparer(Of CtcObjectBase).Compare
                 Select Case True
                     Case x Is Nothing And y Is Nothing
                         Return 0
@@ -248,14 +248,14 @@ Namespace PropertyGridHelpers
             Return True
         End Function
 
-        Public Overloads Overrides Function CanConvertTo(context As ITypeDescriptorContext,  destinationType As System.Type) As Boolean
+        Public Overloads Overrides Function CanConvertTo(context As ITypeDescriptorContext, destinationType As System.Type) As Boolean
             If destinationType Is GetType(String) Then
                 Return True
             End If
             Return MyBase.CanConvertTo(context, destinationType)
         End Function
 
-        Public Overloads Overrides Function ConvertTo(context As ITypeDescriptorContext,  culture As System.Globalization.CultureInfo,  value As Object,  destinationType As System.Type) As Object
+        Public Overloads Overrides Function ConvertTo(context As ITypeDescriptorContext, culture As System.Globalization.CultureInfo, value As Object, destinationType As System.Type) As Object
             Select Case True
                 Case value Is Nothing
                     Return "None"
@@ -266,14 +266,14 @@ Namespace PropertyGridHelpers
             End Select
         End Function
 
-        Public Overloads Overrides Function CanConvertFrom(context As ITypeDescriptorContext,  sourceType As System.Type) As Boolean
+        Public Overloads Overrides Function CanConvertFrom(context As ITypeDescriptorContext, sourceType As System.Type) As Boolean
             If sourceType Is GetType(String) Then
                 Return True
             End If
             Return MyBase.CanConvertFrom(context, sourceType)
         End Function
 
-        Public Overloads Overrides Function ConvertFrom(context As ITypeDescriptorContext,  culture As System.Globalization.CultureInfo,  value As Object) As Object
+        Public Overloads Overrides Function ConvertFrom(context As ITypeDescriptorContext, culture As System.Globalization.CultureInfo, value As Object) As Object
             Select Case value
                 Case "None"
                     Return Nothing
@@ -292,14 +292,14 @@ Namespace PropertyGridHelpers
     Public NotInheritable Class LocationConverter
         Inherits ExpandableObjectConverter
 
-        Public Overloads Overrides Function CanConvertTo(context As ITypeDescriptorContext,  destinationType As Type) As Boolean
+        Public Overloads Overrides Function CanConvertTo(context As ITypeDescriptorContext, destinationType As Type) As Boolean
             If (destinationType Is GetType(Location)) Then
                 Return True
             End If
             Return MyBase.CanConvertFrom(context, destinationType)
         End Function
 
-        Public Overloads Overrides Function ConvertTo(context As ITypeDescriptorContext,  culture As System.Globalization.CultureInfo,  value As Object,  destinationType As System.Type) As Object
+        Public Overloads Overrides Function ConvertTo(context As ITypeDescriptorContext, culture As System.Globalization.CultureInfo, value As Object, destinationType As System.Type) As Object
             If (destinationType Is GetType(System.String) AndAlso TypeOf value Is Location) Then
                 Dim sctLocation As Location = DirectCast(value, Location)
                 Return sctLocation.Col & ", " & sctLocation.Row
@@ -307,14 +307,14 @@ Namespace PropertyGridHelpers
             Return MyBase.ConvertTo(context, culture, value, destinationType)
         End Function
 
-        Public Overloads Overrides Function CanConvertFrom(context As ITypeDescriptorContext,  sourceType As System.Type) As Boolean
+        Public Overloads Overrides Function CanConvertFrom(context As ITypeDescriptorContext, sourceType As System.Type) As Boolean
             If sourceType Is GetType(String) Then
                 Return True
             End If
             Return MyBase.CanConvertFrom(context, sourceType)
         End Function
 
-        Public Overloads Overrides Function ConvertFrom(context As ITypeDescriptorContext,  culture As System.Globalization.CultureInfo,  value As Object) As Object
+        Public Overloads Overrides Function ConvertFrom(context As ITypeDescriptorContext, culture As System.Globalization.CultureInfo, value As Object) As Object
             If TypeOf value Is String Then
                 Try
                     Dim s As String = CStr(value)
@@ -360,11 +360,11 @@ Namespace PropertyGridHelpers
             End Select
         End Function
 
-        Public Overloads Overrides Function CanConvertFrom(context As System.ComponentModel.ITypeDescriptorContext,  sourceType As System.Type) As Boolean
+        Public Overloads Overrides Function CanConvertFrom(context As System.ComponentModel.ITypeDescriptorContext, sourceType As System.Type) As Boolean
             Return True     'since free text is not allowed we can always convert from the string items in the list
         End Function
 
-        Public Overloads Overrides Function ConvertFrom(context As ITypeDescriptorContext,  culture As System.Globalization.CultureInfo,  value As Object) As Object
+        Public Overloads Overrides Function ConvertFrom(context As ITypeDescriptorContext, culture As System.Globalization.CultureInfo, value As Object) As Object
             Return [Enum].Parse(GetType(Sensor.DeviceType), value)
         End Function
 
@@ -410,14 +410,14 @@ Namespace PropertyGridHelpers
             Return New StandardValuesCollection(objList)
         End Function
 
-        Public Overloads Overrides Function CanConvertFrom(context As System.ComponentModel.ITypeDescriptorContext,  sourceType As System.Type) As Boolean
+        Public Overloads Overrides Function CanConvertFrom(context As System.ComponentModel.ITypeDescriptorContext, sourceType As System.Type) As Boolean
             If sourceType Is GetType(String) Then
                 Return True
             End If
             Return MyBase.CanConvertFrom(context, sourceType)
         End Function
 
-        Public Overloads Overrides Function ConvertFrom(context As ITypeDescriptorContext,  culture As System.Globalization.CultureInfo,  value As Object) As Object
+        Public Overloads Overrides Function ConvertFrom(context As ITypeDescriptorContext, culture As System.Globalization.CultureInfo, value As Object) As Object
             If (TypeOf value Is String) Then
                 Try
                     Return System.Enum.Parse(GetType(Signal.SignalAspect), value)
@@ -445,14 +445,14 @@ Namespace PropertyGridHelpers
             Return New StandardValuesCollection(objList)
         End Function
 
-        Public Overloads Overrides Function CanConvertFrom(context As System.ComponentModel.ITypeDescriptorContext,  sourceType As System.Type) As Boolean
+        Public Overloads Overrides Function CanConvertFrom(context As System.ComponentModel.ITypeDescriptorContext, sourceType As System.Type) As Boolean
             If sourceType Is GetType(String) Then
                 Return True
             End If
             Return MyBase.CanConvertFrom(context, sourceType)
         End Function
 
-        Public Overloads Overrides Function ConvertFrom(context As ITypeDescriptorContext,  culture As System.Globalization.CultureInfo,  value As Object) As Object
+        Public Overloads Overrides Function ConvertFrom(context As ITypeDescriptorContext, culture As System.Globalization.CultureInfo, value As Object) As Object
             If (TypeOf value Is String) Then
                 Try
                     Return System.Enum.Parse(GetType(Track.TrackState), value)
@@ -483,12 +483,12 @@ Namespace PropertyGridHelpers
             Return New StandardValuesCollection(objList)
         End Function
 
-        Public Overloads Overrides Function CanConvertFrom(context As System.ComponentModel.ITypeDescriptorContext,  sourceType As System.Type) As Boolean
+        Public Overloads Overrides Function CanConvertFrom(context As System.ComponentModel.ITypeDescriptorContext, sourceType As System.Type) As Boolean
             If sourceType Is GetType(String) Then Return True
             Return MyBase.CanConvertFrom(context, sourceType)
         End Function
 
-        Public Overloads Overrides Function ConvertFrom(context As ITypeDescriptorContext,  culture As System.Globalization.CultureInfo,  value As Object) As Object
+        Public Overloads Overrides Function ConvertFrom(context As ITypeDescriptorContext, culture As System.Globalization.CultureInfo, value As Object) As Object
             If (TypeOf value Is String) Then Return value
             Return MyBase.ConvertFrom(context, culture, value)
         End Function
@@ -520,12 +520,12 @@ Namespace PropertyGridHelpers
                 PkImmediate.DccInstrType.Func13To20, PkImmediate.DccInstrType.Func21To28})
         End Function
 
-        Public Overloads Overrides Function CanConvertFrom(context As System.ComponentModel.ITypeDescriptorContext,  sourceType As System.Type) As Boolean
+        Public Overloads Overrides Function CanConvertFrom(context As System.ComponentModel.ITypeDescriptorContext, sourceType As System.Type) As Boolean
             'since the entry is limited to the list we are guaranteed that the entry can be converted
             Return True
         End Function
 
-        Public Overloads Overrides Function ConvertFrom(context As ITypeDescriptorContext,  culture As System.Globalization.CultureInfo,  value As Object) As Object
+        Public Overloads Overrides Function ConvertFrom(context As ITypeDescriptorContext, culture As System.Globalization.CultureInfo, value As Object) As Object
             'since the entry is limited to the list we are guaranteed that the entry can be converted
             Return System.Enum.Parse(GetType(PkImmediate.DccInstrType), value)
         End Function
@@ -540,7 +540,7 @@ Namespace PropertyGridHelpers
     Public NotInheritable Class MultiPortEditor
         Inherits UITypeEditor
 
-        Public Overloads Overrides Function EditValue(context As ITypeDescriptorContext,  provider As IServiceProvider,  value As Object) As Object
+        Public Overloads Overrides Function EditValue(context As ITypeDescriptorContext, provider As IServiceProvider, value As Object) As Object
             If context IsNot Nothing And context.Instance IsNot Nothing And provider IsNot Nothing Then
                 Dim objService As IWindowsFormsEditorService = provider.GetService(GetType(IWindowsFormsEditorService))
                 If objService IsNot Nothing Then
@@ -566,7 +566,7 @@ Namespace PropertyGridHelpers
     Public NotInheritable Class DccFunctionsEditor
         Inherits UITypeEditor
 
-        Public Overloads Overrides Function EditValue(context As ITypeDescriptorContext,  provider As IServiceProvider,  value As Object) As Object
+        Public Overloads Overrides Function EditValue(context As ITypeDescriptorContext, provider As IServiceProvider, value As Object) As Object
             If context IsNot Nothing And context.Instance IsNot Nothing And provider IsNot Nothing Then
                 Dim objService As IWindowsFormsEditorService = provider.GetService(GetType(IWindowsFormsEditorService))
                 If objService IsNot Nothing Then
@@ -1067,12 +1067,12 @@ Namespace PropertyGridHelpers
             End Set
         End Property
 
-        Public Property SwitchTime() As UShort
+        Public Property PostPkWait() As UShort
             Get
-                Return _objWrappedObject.States.SwitchTime
+                Return _objWrappedObject.States.PostPkWait
             End Get
             Set(Value As UShort)
-                _objWrappedObject.States.SwitchTime = Value
+                _objWrappedObject.States.PostPkWait = Value
             End Set
         End Property
 
@@ -1098,7 +1098,7 @@ Namespace PropertyGridHelpers
         End Property
 
         Public Overrides Function PropGridSort() As String()
-            Return New String() {"Name", "Location", "Type", "Orientation", "Block", "SwitchTime", "DefaultState", "ActiveState", "Disposition"}
+            Return New String() {"Name", "Location", "Type", "Orientation", "Block", "PostPkWait", "DefaultState", "ActiveState", "Disposition"}
         End Function
 
         Public Overrides Function PropGridDynamicAttrib() As ListDictionary
@@ -1110,7 +1110,7 @@ Namespace PropertyGridHelpers
             Dim objaType As Attribute() = {New DescriptionAttribute("The configuration type of this track element."), New RefreshPropertiesAttribute(RefreshProperties.All)} 'RefreshProperties.All re-queries the PropertyGridConverter; needed for changes between track and turnouts  
             Dim objaOrient As Attribute() = {New DescriptionAttribute("The rotated position of the track element placed on the switchboard. Valid values are 1-8.")}
             Dim objaBlock As Attribute() = {New DescriptionAttribute("The block that this track is a part of."), New TypeConverterAttribute(GetType(CtcObjectBaseConverter))}
-            Dim objaSwTime As Attribute() = {New DescriptionAttribute("Time in milliseconds that it takes for this turnout to switch from one state to another."), New BrowsableAttribute(blnShowForTurnouts)}
+            Dim objaPkWait As Attribute() = {New DescriptionAttribute("Time in milliseconds to wait, after sending all state packets, before considering the turnout's state settled."), New BrowsableAttribute(blnShowForTurnouts)}
             Dim objaDefSta As Attribute() = {New DescriptionAttribute("Turnout state assigned when the railroad is reset."), New BrowsableAttribute(blnShowForTurnouts), New TypeConverterAttribute(GetType(TrackStateConverter))}
             Dim objaActSta As Attribute() = {New DescriptionAttribute("Currently active turnout state."), New TypeConverterAttribute(GetType(TrackStateConverter)), New BrowsableAttribute(blnShowForTurnouts)}
             Dim objaDisp As Attribute() = {New DescriptionAttribute("The three disposition values are: Set=(points are set), Pending=(points are being switched), Locked=(points are set and locked)."), New BrowsableAttribute(blnShowForTurnouts)}
@@ -1120,7 +1120,7 @@ Namespace PropertyGridHelpers
                 DynAttrib.Disable(objaType)
                 DynAttrib.Disable(objaOrient)
                 DynAttrib.Disable(objaBlock)
-                DynAttrib.Disable(objaSwTime)
+                DynAttrib.Disable(objaPkWait)
                 DynAttrib.Disable(objaDefSta)
             End If
 
@@ -1128,7 +1128,7 @@ Namespace PropertyGridHelpers
             objList.Add("Type", New DynamicDescriptor(objaType))
             objList.Add("Orientation", New DynamicDescriptor(objaOrient))
             objList.Add("Block", New DynamicDescriptor(objaBlock))
-            objList.Add("SwitchTime", New DynamicDescriptor("Switch Time", objaSwTime))
+            objList.Add("PostPkWait", New DynamicDescriptor("Post Pk Wait", objaPkWait))
             objList.Add("DefaultState", New DynamicDescriptor("Default State", objaDefSta))
             objList.Add("ActiveState", New DynamicDescriptor("Active State", objaActSta))
             objList.Add("Disposition", New DynamicDescriptor(objaDisp))
@@ -1660,12 +1660,12 @@ Namespace PropertyGridHelpers
             End Get
         End Property
 
-        Public Property SwitchTime() As UShort
+        Public Property PostPkWait() As UShort
             Get
-                Return _objWrappedObject.Aspects.SwitchTime
+                Return _objWrappedObject.Aspects.PostPkWait
             End Get
             Set(Value As UShort)
-                _objWrappedObject.Aspects.SwitchTime = Value
+                _objWrappedObject.Aspects.PostPkWait = Value
             End Set
         End Property
 
@@ -1691,7 +1691,7 @@ Namespace PropertyGridHelpers
         End Property
 
         Public Overrides Function PropGridSort() As String()
-            Return New String() {"Name", "Location", "Type", "DrawScale", "CellAlign", "AlignOffsetX", "AlignOffsetY", "SwitchTime", "DefaultAspect", "ActiveAspect", "Disposition"}
+            Return New String() {"Name", "Location", "Type", "DrawScale", "CellAlign", "AlignOffsetX", "AlignOffsetY", "PostPkWait", "DefaultAspect", "ActiveAspect", "Disposition"}
         End Function
 
         Public Overrides Function PropGridDynamicAttrib() As ListDictionary
@@ -1703,7 +1703,7 @@ Namespace PropertyGridHelpers
             Dim objaAlign As Attribute() = {New DescriptionAttribute("The signal's drawing surface alignment in relation to its switchboard cell location.")}
             Dim objaOffsetX As Attribute() = {New DescriptionAttribute("The horizontal decimal offset of the signal's drawing surface from the position set by 'Cell Align'.")}
             Dim objaOffsetY As Attribute() = {New DescriptionAttribute("The vertical decimal offset of the signal's drawing surface from the position set by 'Cell Align'.")}
-            Dim objaSwTime As Attribute() = {New DescriptionAttribute("Time in millisecons that it takes for this signal to switch from one aspect to another.")}
+            Dim objaPkWait As Attribute() = {New DescriptionAttribute("Time in milliseconds to wait, after sending all state packets, before considering the signal's aspect settled.")}
             Dim objaDefAsp As Attribute() = {New DescriptionAttribute("Aspect state assigned to the signal when the railroad is reset."), New TypeConverterAttribute(GetType(AspectConverter))}
             Dim objaActAsp As Attribute() = {New DescriptionAttribute("Currently active signal aspect."), New TypeConverterAttribute(GetType(AspectConverter))}
             Dim objaDisp As Attribute() = {New DescriptionAttribute("The three disposition values are: Set=(aspect is set), Pending=(aspect is being switched), Locked=(aspect is set and locked).")}
@@ -1715,7 +1715,7 @@ Namespace PropertyGridHelpers
                 DynAttrib.Disable(objaAlign)
                 DynAttrib.Disable(objaOffsetX)
                 DynAttrib.Disable(objaOffsetY)
-                DynAttrib.Disable(objaSwTime)
+                DynAttrib.Disable(objaPkWait)
                 DynAttrib.Disable(objaDefAsp)
             End If
 
@@ -1725,7 +1725,7 @@ Namespace PropertyGridHelpers
             objList.Add("CellAlign", New DynamicDescriptor("Cell Align.", objaAlign))
             objList.Add("AlignOffsetX", New DynamicDescriptor("Horz. Offset", objaOffsetX))
             objList.Add("AlignOffsetY", New DynamicDescriptor("Vert. Offset", objaOffsetY))
-            objList.Add("SwitchTime", New DynamicDescriptor("Switch Time", objaSwTime))
+            objList.Add("PostPkWait", New DynamicDescriptor("Post Pk Wait", objaPkWait))
             objList.Add("DefaultAspect", New DynamicDescriptor("Default Aspect", objaDefAsp))
             objList.Add("ActiveAspect", New DynamicDescriptor("Active Aspect", objaActAsp))
             objList.Add("Disposition", New DynamicDescriptor(objaDisp))
@@ -1747,12 +1747,12 @@ Namespace PropertyGridHelpers
             End Get
         End Property
 
-        Public Property SwitchTime() As UShort
+        Public Property PostPkWait() As UShort
             Get
-                Return _objWrappedObject.States.SwitchTime
+                Return _objWrappedObject.States.PostPkWait
             End Get
             Set(Value As UShort)
-                _objWrappedObject.States.SwitchTime = Value
+                _objWrappedObject.States.PostPkWait = Value
             End Set
         End Property
 
@@ -1787,23 +1787,23 @@ Namespace PropertyGridHelpers
         End Property
 
         Public Overrides Function PropGridSort() As String()
-            Return New String() {"Name", "SwitchTime", "DefaultState", "ActiveState", "Disposition"}
+            Return New String() {"Name", "PostPkWait", "DefaultState", "ActiveState", "Disposition"}
         End Function
 
         Public Overrides Function PropGridDynamicAttrib() As ListDictionary
             Dim objList As ListDictionary = MyBase.PropGridDynamicAttrib()
 
-            Dim objaSwTime As Attribute() = {New DescriptionAttribute("Time in millisecons that it takes for this accessory to switch from one state to another.")}
+            Dim objaPkWait As Attribute() = {New DescriptionAttribute("Time in milliseconds to wait, after sending all state packets, before considering the accessory's state settled.")}
             Dim objaDefSta As Attribute() = {New DescriptionAttribute("State assigned to the accessory when the railroad is reset."), New TypeConverterAttribute(GetType(AccessoryStateConverter))}
             Dim objaActSta As Attribute() = {New DescriptionAttribute("Currently active accessory state."), New TypeConverterAttribute(GetType(AccessoryStateConverter))}
             Dim objaDisp As Attribute() = {New DescriptionAttribute("The three disposition values are: Set=(state is set), Pending=(state is being set), Locked=(state is set and locked).")}
 
             If CtcService.IsStarted Then
-                DynAttrib.Disable(objaSwTime)
+                DynAttrib.Disable(objaPkWait)
                 DynAttrib.Disable(objaDefSta)
             End If
 
-            objList.Add("SwitchTime", New DynamicDescriptor("Switch Time", objaSwTime))
+            objList.Add("PostPkWait", New DynamicDescriptor("Post Pk Wait", objaPkWait))
             objList.Add("DefaultState", New DynamicDescriptor("Default State", objaDefSta))
             objList.Add("ActiveState", New DynamicDescriptor("Active State", objaActSta))
             objList.Add("Disposition", New DynamicDescriptor(objaDisp))
@@ -2469,14 +2469,30 @@ Namespace PropertyGridHelpers
             End Get
         End Property
 
+        Public Property PostTxWait() As UShort
+            Get
+                Return _objWrappedObject.PostTxWait
+            End Get
+            Set(Value As UShort)
+                _objWrappedObject.PostTxWait = Value
+            End Set
+        End Property
+
         Public Overridable Function PropGridSort() As String() Implements IDynamicPropertyGrid.PropGridSort
         End Function
 
         Public Overridable Function PropGridDynamicAttrib() As ListDictionary Implements IDynamicPropertyGrid.PropGridDynamicAttrib
             Dim objList As New ListDictionary
+
             Dim objaOpCode As Attribute() = {New DescriptionAttribute("Packet type name as defined by the Loconet specification.")}
+            Dim objaTxWait As Attribute() = {New DescriptionAttribute("Time in milliseconds to wait, after sending this packet, before sending the next packet.")}
+
+            If CtcService.IsStarted Then
+                DynAttrib.Disable(objaTxWait)
+            End If
 
             objList.Add("OpCode", New DynamicDescriptor("Op Code", objaOpCode))
+            objList.Add("PostTxWait", New DynamicDescriptor("Post Tx Wait", objaTxWait))
             Return objList
         End Function
 
@@ -2517,7 +2533,7 @@ Namespace PropertyGridHelpers
         End Property
 
         Public Overrides Function PropGridSort() As String()
-            Return New String() {"OpCode", "Switch", "State", "Key"}
+            Return New String() {"OpCode", "Switch", "State", "Key", "PostTxWait"}
         End Function
 
         Public Overrides Function PropGridDynamicAttrib() As ListDictionary
@@ -2585,7 +2601,7 @@ Namespace PropertyGridHelpers
         End Property
 
         Public Overrides Function PropGridSort() As String()
-            Return New String() {"OpCode", "Address", "BDL16Adr", "BDL16Port", "State"}
+            Return New String() {"OpCode", "Address", "BDL16Adr", "BDL16Port", "State", "PostTxWait"}
         End Function
 
         Public Overrides Function PropGridDynamicAttrib() As ListDictionary
@@ -2679,7 +2695,7 @@ Namespace PropertyGridHelpers
         End Property
 
         Public Overrides Function PropGridSort() As String()
-            Return New String() {"OpCode", "DccAdr", "Instruction", "Configuration"}
+            Return New String() {"OpCode", "DccAdr", "Instruction", "Configuration", "PostTxWait"}
         End Function
 
         Public Overrides Function PropGridDynamicAttrib() As ListDictionary
@@ -2742,7 +2758,7 @@ Namespace PropertyGridHelpers
         End Property
 
         Public Overrides Function PropGridSort() As String()
-            Return New String() {"OpCode", "Address", "Configuration"}
+            Return New String() {"OpCode", "Address", "Configuration", "PostTxWait"}
         End Function
 
         Public Overrides Function PropGridDynamicAttrib() As ListDictionary

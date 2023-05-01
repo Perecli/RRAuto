@@ -545,7 +545,7 @@ Namespace CTC
         Implements IEnumerable, ISerializable, IDeserializationComplete
         Friend _objParent As CtcObjectBase
         Friend _objStatesList As List(Of PkStatesList.State)
-        Friend _srtSwitchTime As UShort
+        Friend _srtPostPkWait As UShort
         Friend _bytDefaultState As Byte
         Friend _bytActiveState As Byte
         Friend _enuDisposition As StateDisposition
@@ -561,7 +561,7 @@ Namespace CTC
         Protected Sub New(info As SerializationInfo, context As StreamingContext)
             'this occurs only for definitions
             _objStatesList = info.GetValue("StatesList", GetType(Object))
-            _srtSwitchTime = info.GetInt16("SwitchTime")
+            _srtPostPkWait = info.GetInt16("SwitchTime")  'renamed
             _bytDefaultState = info.GetByte("DefaultState")
             _bytActiveState = _bytDefaultState  'init this in case states file is not available otherwise it will get overriden anyway
         End Sub
@@ -584,7 +584,7 @@ Namespace CTC
         Protected Sub GetObjectData(info As SerializationInfo, context As StreamingContext) Implements ISerializable.GetObjectData
             'this occurs only for definitions
             info.AddValue("StatesList", _objStatesList)
-            info.AddValue("SwitchTime", _srtSwitchTime)
+            info.AddValue("SwitchTime", _srtPostPkWait)    'renamed
             info.AddValue("DefaultState", _bytDefaultState)
         End Sub
 
@@ -730,14 +730,16 @@ Namespace CTC
 
 #Region "Configuration"
 
-        ''' <summary>Gets or sets the time in milliseconds to transition from one state to another.</summary>
-        Public Property SwitchTime() As UShort
+        ''' <summary>Gets or sets the time in milliseconds to wait, after sending all state packets, before considering the state settled.</summary>
+        ''' <remarks>For slow motion switching machines this ensures the virtual state is not set before the physical state has a chance to settle.</remarks>
+        ''' <seealso cref="Packet.PostTxWait"/>
+        Public Property PostPkWait() As UShort
             Get
-                Return _srtSwitchTime
+                Return _srtPostPkWait
             End Get
             Set(Value As UShort)
                 CtcIsStartedException.Check()
-                _srtSwitchTime = Value
+                _srtPostPkWait = Value
             End Set
         End Property
 
@@ -935,10 +937,11 @@ Namespace CTC
                 If Not CtcService.SimulationMode Then
                     For Each objPacket As Packet In objState
                         Await CtcService.LoconetService.TxPacket(objPacket.Clone())
+                        Await Task.Delay(objPacket.PostTxWait)
                     Next
                 End If
 
-                Await Task.Delay(_srtSwitchTime)
+                Await Task.Delay(_srtPostPkWait)
 
                 Await SetActiveStateAndInvoke(objState.Value, sctCancelToken)
                 CtcService.PostMessage(CtcService.MessageCat.Native, String.Format("[{0}] has been set to [{1}].", _objParent.ToString, objState.Name))

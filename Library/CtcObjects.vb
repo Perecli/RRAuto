@@ -453,7 +453,7 @@ Namespace CTC
                 If Value.ToString.StartsWith("Turnout") Then
                     If _objStates Is Nothing Then
                         _objStates = New PkStatesList(Me)
-                        _objStates._srtSwitchTime = 1000
+                        _objStates._srtPostPkWait = 1000
                     End If
                     Select Case Value
                         Case TrackType.TurnoutLeft, TrackType.TurnoutRight
@@ -1110,8 +1110,8 @@ Namespace CTC
         ''' <summary>Indicates whether the route should serialize the switching of its turnouts.</summary>
         ''' <remarks>
         ''' Some switch solenoids operate such that concurrent turnout switching can be problematic. 
-        ''' This option switches a route's turnouts one at a time. Each turnout waits until the switch time of the previous one in the list has elapsed. 
-        ''' The <see cref="PkStatesList.SwitchTime" /> of <see cref="Track.States"/> for each turnout should be tuned based on the solenoid's characteristics.
+        ''' This option switches a route's turnouts one at a time waiting for the state of the previous one to settle before setting the next. 
+        ''' The settling of the states can be further tuned through <see cref="PkStatesList.PostPkWait" /> or <see cref="Packet.PostTxWait" />.
         ''' </remarks>
         Public Property SerializeSwitching() As Boolean
             Get
@@ -1778,7 +1778,7 @@ Namespace CTC
         Public Sub New(enuConfig As SignalConfig, strLookKey As String)
             _sctLocation = New Location(1, 1)
             _objStates = New PkStatesList(Me)
-            _objStates._srtSwitchTime = 100
+            _objStates._srtPostPkWait = 100
             Me.Config = enuConfig
             _strLookKey = strLookKey
         End Sub
@@ -2277,7 +2277,7 @@ Namespace CTC
             Dim objState As New PkStatesList.State(_intStatesNamingCounter, Me)
             With _objStates
                 ._objStatesList.Add(objState)
-                ._srtSwitchTime = 100
+                ._srtPostPkWait = 100
                 If ._bytDefaultState = 0 Then ._bytDefaultState = objState.Value
                 If ._bytActiveState = 0 Then ._bytActiveState = ._bytDefaultState
             End With

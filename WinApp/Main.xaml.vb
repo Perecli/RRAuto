@@ -294,9 +294,10 @@ Namespace Windows
             Me.Cursor = Cursors.Arrow
 
             If blnCompatibilityMode Then
-                MessageBox.Show(Me, "This layout file was opened in compatibility mode." & vbCrLf & vbCrLf &
-                    "Next time the layout is saved, it will be upgraded to the current version format. " &
-                    "Since downgrading the layout back to a previous version is not supported, a backup should be made prior to saving.",
+                MessageBox.Show(Me, "Older layout file detected and opened in compatibility mode." & vbCrLf & vbCrLf &
+                    "Saving your layout file in the current version of the app will upgrade it to the new format " &
+                    "and will make it incompatible with older versions." & vbCrLf & vbCrLf &
+                    "If you forsee needing to open this layout in older versions, make a backup before saving.",
                     My.Application.Name, MessageBoxButton.OK, MessageBoxImage.Information)
             End If
         End Sub

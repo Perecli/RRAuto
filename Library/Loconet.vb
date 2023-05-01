@@ -1390,9 +1390,6 @@ Namespace Loconet
     <Serializable()> Public MustInherit Class Packet
         Implements ISerializable, ICloneable
 
-        'the KnownType attributes above are strictly for WCF serialization
-        'apparently when a specific packet type is marshaled through its base type, WCF needs to know which inherited types are associated with the base type
-
         ''' <summary>Exposed through <see cref="Bytes"/> property.</summary>
         Protected _bytaBytes As Byte()
         ''' <summary>Exposed through <see cref="ID"/> property.</summary>
@@ -1403,6 +1400,8 @@ Namespace Loconet
         Protected _objTag As Object
         ''' <summary>Exposed through <see cref="IsEchoe"/> property.</summary>
         Protected _blnIsEchoe As Boolean
+        ''' <summary>Exposed through <see cref="PostTxWait"/> property.</summary>
+        Protected _srtPostTxWait As UShort
         ''' <summary>Exposed through <see cref="TimeStamp"/> property.</summary>
         Protected _dblTimeStamp As Double
 
@@ -1412,46 +1411,30 @@ Namespace Loconet
 #Region "Serialization"
 
         Protected Sub New(info As SerializationInfo, context As StreamingContext)
-            Select Case context.State
-                Case StreamingContextStates.File
-                    'for layout save
-                    Try
-                        _bytaBytes = info.GetValue("Bytes", GetType(Object))
-                    Catch
-                        _bytaBytes = info.GetValue("_bytaPacket", GetType(Object))
+            'for layout save
+            Try
+                _bytaBytes = info.GetValue("Bytes", GetType(Object))  'current
+            Catch
+                _bytaBytes = info.GetValue("_bytaPacket", GetType(Object))  'old name
 
-                        'compatibility added 11/25/11
-                        CtcService.CompatibilityMode = True
-                    End Try
+                'compatibility added 11/25/11
+                CtcService.CompatibilityMode = True
+            End Try
+            Try
+                _srtPostTxWait = info.GetValue("PostTxWait", GetType(UShort))  'current
+            Catch ex As SerializationException
+                'never existed so do nothing
 
-                Case StreamingContextStates.All
-                    'for WCF
-                    _bytaBytes = info.GetValue("Bytes", GetType(Object))
-                    _sctID = info.GetValue("ID", GetType(Object))
-                    _objRxPacket = info.GetValue("RxPacket", GetType(Object))
-                    _blnIsEchoe = info.GetBoolean("IsEchoe")
-                    _dblTimeStamp = info.GetDouble("TimeStamp")
-
-            End Select
-
+                'compatibility added 04/30/23
+                'no need for compatibility warning since old app version won't look for this field anyway
+            End Try
         End Sub
 
         <SecurityPermission(SecurityAction.LinkDemand, Flags:=SecurityPermissionFlag.SerializationFormatter)>
         Protected Overridable Sub GetObjectData(info As SerializationInfo, context As StreamingContext) Implements ISerializable.GetObjectData
-            Select Case context.State
-                Case StreamingContextStates.File
-                    'for layout save
-                    info.AddValue("Bytes", _bytaBytes)
-
-                Case StreamingContextStates.All
-                    'for WCF
-                    info.AddValue("Bytes", _bytaBytes)
-                    info.AddValue("ID", _sctID)
-                    info.AddValue("RxPacket", _objRxPacket)
-                    info.AddValue("IsEchoe", _blnIsEchoe)
-                    info.AddValue("TimeStamp", _dblTimeStamp)
-            End Select
-
+            'for layout save
+            info.AddValue("Bytes", _bytaBytes)
+            info.AddValue("PostTxWait", _srtPostTxWait)
         End Sub
 
 #End Region
@@ -1489,6 +1472,22 @@ Namespace Loconet
             End Get
             Set(Value As Object)
                 _objTag = Value
+            End Set
+        End Property
+
+        ''' <summary>Gets or sets the time in milliseconds to wait after sending this packet before performing the next step.</summary>
+        ''' <remarks>
+        ''' Note that this property is not used by the Loconet service and exists only as a data placeholder for external consumers.
+        ''' For example, after sending a packet there may be a need to wait for a physical device to complete an action before sending the next packet.
+        ''' For configuration purposes the wait value can be stored in this property for convenience.
+        ''' </remarks>
+        ''' <seealso cref="PkStatesList.PostPkWait"/>
+        Public Property PostTxWait() As UShort
+            Get
+                Return _srtPostTxWait
+            End Get
+            Set(Value As UShort)
+                _srtPostTxWait = Value
             End Set
         End Property
 
