@@ -1104,10 +1104,10 @@ Namespace Loconet
     ''' <summary>Specifies the type of a switch input message.</summary>
     ''' <remarks>This enumeration is used by the <see cref="PkSwitchInput"/> class.</remarks> 
     Public Enum SwitchInputType As Byte
-        ''' <summary>A message indicating input levels for turnout feedback.</summary>
-        InputLevels
-        ''' <summary>A message indicating current output levels.</summary>
-        OutputLevels
+        ''' <summary>A message encoding input levels for turnout feedback.</summary>
+        InputLevels = 1
+        ''' <summary>A message encoding current output levels.</summary>
+        OutputLevels = 0
     End Enum
 
     ''' <summary>Specifies the type of a long acknowledgement message.</summary>
@@ -1186,7 +1186,7 @@ Namespace Loconet
             Return (CType(bytHighByte, UShort) << 7) Or bytLowByte
         End Function
 
-        Friend Sub SetAddress(ByRef bytHighByte As Byte, ByRef bytLowByte As Byte,  Value As UShort)
+        Friend Sub SetAddress(ByRef bytHighByte As Byte, ByRef bytLowByte As Byte, Value As UShort)
             If Value > 16383 Then Throw New ArgumentOutOfRangeException(Nothing, "Invalid address. Valid values are 0-16383.")
 
             bytHighByte = (Value >> 7) And 127
@@ -1210,7 +1210,7 @@ Namespace Loconet
             Return BitWise.BitFlagsToArray(bytDataByte, 5)
         End Function
 
-        Friend Sub SetFunctions0to4(ByRef bytDataByte As Byte,  enuaFuncs As OnOff())
+        Friend Sub SetFunctions0to4(ByRef bytDataByte As Byte, enuaFuncs As OnOff())
             If enuaFuncs.GetUpperBound(0) <> 4 Then Throw New IndexOutOfRangeException("The upper bound of given array must be 4.")
 
             Dim bytFuncBits As Byte = BitWise.ArrayToBitFlags(enuaFuncs)        'gets [0,0,0,F4,F3,F2,F1,F0]
@@ -1218,7 +1218,7 @@ Namespace Loconet
             bytDataByte = bytFuncBits Or (bytDataByte And 224)                  'gets [P,P,P,F0,F4,F3,F2,F1]    P = previous bits
         End Sub
 
-        Friend Sub SetFunctions5to8or9to12(ByRef bytDataByte As Byte,  enuaFuncs As OnOff())
+        Friend Sub SetFunctions5to8or9to12(ByRef bytDataByte As Byte, enuaFuncs As OnOff())
             If enuaFuncs.GetUpperBound(0) <> 3 Then Throw New IndexOutOfRangeException("The upper bound of given array must be 3.")
 
             Dim bytFuncBits As Byte = BitWise.ArrayToBitFlags(enuaFuncs)        'gets [0,0,0,0,F8,F7,F6,F5] or [0,0,0,0,F12,F11,F10,F9]
@@ -1271,7 +1271,7 @@ Namespace Loconet
             Return ((bytDataByte And 8) >> 2) Or ((bytDataByte And 64) >> 6)
         End Function
 
-        Friend Sub SetConsistType(ByRef bytDataByte As Byte,  Value As ConsistType)
+        Friend Sub SetConsistType(ByRef bytDataByte As Byte, Value As ConsistType)
             bytDataByte = (bytDataByte And 183) Or ((Value And 1) << 6) Or ((Value And 2) << 2)
         End Sub
 
@@ -1279,7 +1279,7 @@ Namespace Loconet
             Return bytDataByte And 7
         End Function
 
-        Friend Sub SetSpeedSteps(ByRef bytDataByte As Byte,  Value As SpeedSteps)
+        Friend Sub SetSpeedSteps(ByRef bytDataByte As Byte, Value As SpeedSteps)
             bytDataByte = (bytDataByte And 248) Or Value
         End Sub
 
@@ -2007,7 +2007,7 @@ Namespace Loconet
         ''' <seealso cref="PkGetSwitchState.Description"/>
         Public Overrides ReadOnly Property ParmsDesc() As String
             Get
-                Return "Num=" & Me.Switch
+                Return $"Num={Me.Switch}"
             End Get
         End Property
 
@@ -2081,7 +2081,7 @@ Namespace Loconet
         ''' <seealso cref="PkSetLocoAdr.Description"/>
         Public Overrides ReadOnly Property ParmsDesc() As String
             Get
-                Return "Adr=" & Me.Address
+                Return $"Adr={Me.Address}"
             End Get
         End Property
 
@@ -2165,7 +2165,7 @@ Namespace Loconet
         ''' <seealso cref="PkSetSlotSpeed.Description"/>
         Public Overrides ReadOnly Property ParmsDesc() As String
             Get
-                Return String.Format("Slot={0} Spd={1}", Me.Slot, Me.Speed)
+                Return $"Slot={Me.Slot} Spd={Me.Speed}"
             End Get
         End Property
 
@@ -2528,7 +2528,7 @@ Namespace Loconet
         ''' <seealso cref="PkSlotMove.Description"/>
         Public Overrides ReadOnly Property ParmsDesc() As String
             Get
-                Return String.Format("Src={0} Dest={1}", Me.SourceSlot, Me.DestSlot)
+                Return $"Src={Me.SourceSlot} Dest={Me.DestSlot}"
             End Get
         End Property
 
@@ -2616,7 +2616,7 @@ Namespace Loconet
         ''' <seealso cref="PkSlotLink.Description"/>
         Public Overrides ReadOnly Property ParmsDesc() As String
             Get
-                Return String.Format("Slave={0} Master={1}", Me.SlaveSlot, Me.MasterSlot)
+                Return $"Slave={Me.SlaveSlot} Master={Me.MasterSlot}"
             End Get
         End Property
 
@@ -2698,7 +2698,7 @@ Namespace Loconet
         ''' <seealso cref="PkSlotUnlink.Description"/>
         Public Overrides ReadOnly Property ParmsDesc() As String
             Get
-                Return String.Format("Unlink={0} From={1}", Me.UnlinkSlot, Me.FromSlot)
+                Return $"Unlink={Me.UnlinkSlot} From={Me.FromSlot}"
             End Get
         End Property
 
@@ -2796,7 +2796,7 @@ Namespace Loconet
         ''' <seealso cref="PkSlotStatus.Description"/>
         Public Overrides ReadOnly Property ParmsDesc() As String
             Get
-                Return String.Format("Slot={0} Activity={1}", Me.Slot, Me.Activity.ToString)
+                Return $"Slot={Me.Slot} Activity={Me.Activity}"
             End Get
         End Property
 
@@ -3165,7 +3165,7 @@ Namespace Loconet
         ''' <seealso cref="PkLocoSlot.Description"/>
         Public Overrides ReadOnly Property ParmsDesc() As String
             Get
-                Return String.Format("Slot={0} Adr={1} Spd={2}", Me.Slot, Me.Address, Me.Speed)
+                Return $"Slot={Me.Slot} Adr={Me.Address} Spd={Me.Speed}"
             End Get
         End Property
 
@@ -3221,7 +3221,7 @@ Namespace Loconet
         ''' <seealso cref="PkFastClock.Description"/>
         Public Overrides ReadOnly Property ParmsDesc() As String
             Get
-                Return String.Format("Slot={0}", Me.Slot)
+                Return $"Slot={Me.Slot}"
             End Get
         End Property
 
@@ -3418,12 +3418,8 @@ Namespace Loconet
         ''' <seealso cref="PkDccProgram.Description"/>
         Public Overrides ReadOnly Property ParmsDesc() As String
             Get
-                Return String.Format("Mode={0} OpAdr={1} CvNum={2} CvValue={3}{4}", _
-                Me.ProgMode.ToString, _
-                Me.OpAddress, _
-                Me.CvNumber, _
-                Me.CvValue, _
-                If(Me.OpCode = OpCodes.SL_RD_DATA, " Reply=" & Me.ProgErrFlags, ""))
+                Dim progErrFlags = If(Me.OpCode = OpCodes.SL_RD_DATA, $" Reply={Me.ProgErrFlags}", "")
+                Return $"Mode={Me.ProgMode} OpAdr={Me.OpAddress} CvNum={Me.CvNumber} CvValue={Me.CvValue}{progErrFlags}"
             End Get
         End Property
 
@@ -3518,7 +3514,7 @@ Namespace Loconet
         ''' <seealso cref="PkComStatOps.Description"/>
         Public Overrides ReadOnly Property ParmsDesc() As String
             Get
-                Return String.Format("Slot={0}", Me.Slot)
+                Return $"Slot={Me.Slot}"
             End Get
         End Property
 
@@ -3594,7 +3590,7 @@ Namespace Loconet
         ''' <seealso cref="PkSetLocoAdrExp.Description"/>
         Public Overrides ReadOnly Property ParmsDesc() As String
             Get
-                Return "Adr=" & Me.Address
+                Return $"Adr={Me.Address}"
             End Get
         End Property
 
@@ -4301,7 +4297,7 @@ Namespace Loconet
         ''' <value>Valid values are 0-2047.</value>
         Public Property Address() As UShort
             Get
-                'converts from: Byte(1)[0,A6,A5,A4,A3,A2,A1,A0], Byte(2)[0,x,x,x,A10,A9,A8,A7] to [A10,A9,A8,A7,A6,A5,A4,A3,A2,A1,A0]
+                'converts from: Byte(1)[0,A6,A5,A4,A3,A2,A1,A0], Byte(2)[0xxx,A10,A9,A8,A7] to [A10,A9,A8,A7,A6,A5,A4,A3,A2,A1,A0]
                 Dim srtResult As UShort = _bytaBytes(1)         'A0-A6 
                 CopyBits(_bytaBytes(2), 0, 4, srtResult, 7)     'A7-A10
                 Return srtResult
@@ -4325,15 +4321,17 @@ Namespace Loconet
             End Set
         End Property
 
-        Public ReadOnly Property Type() As SwitchInputType
+        ''' <summary>Determines how packet is encoded as it comes in two variants.</summary>
+        ''' <value>A member of the <see cref="SwitchInputType"/>.</value>
+        Public Property Type() As SwitchInputType
             Get
-                Select Case _bytaBytes(2) >> 6
-                    Case 0
-                        Return SwitchInputType.OutputLevels
-                    Case 1
-                        Return SwitchInputType.InputLevels
-                End Select
+                'Byte(2)[0Txxxxxx]; gets T (type) bit
+                Return CopyBits(_bytaBytes(2), 6, 1, 0, 0)
             End Get
+            Set(value As SwitchInputType)
+                'Byte(2)[0Txxxxxx]; sets T (type) bit
+                CopyBits(value, 0, 1, _bytaBytes(2), 6)
+            End Set
         End Property
 
         ''' <summary>Gets or sets the DS54 device address.</summary>
@@ -4368,13 +4366,33 @@ Namespace Loconet
             End Set
         End Property
 
-        ''' <summary>Gets or sets the reported state of the input address.</summary>
+        ''' <summary>Gets or sets the reported state based on encoding defined by <see cref="Type"/>.</summary>
+        ''' <value>A member of the <see cref="OnOff"/>.</value>
         Public Property State() As OnOff
             Get
-                Return BitWise.GetOnOffState(_bytaBytes(2))
+                Select Case Me.Type
+                    Case SwitchInputType.InputLevels
+                        'Byte(2)[0xILxxxx]; gets L (levels) bit
+                        Return CopyBits(_bytaBytes(2), 4, 1, 0, 0)
+
+                    Case SwitchInputType.OutputLevels
+                        'Byte(2)[0xCTxxxx]; gets C (closed) bit; T (thrown) bit is ignored as it's always opposite of C
+                        Return CopyBits(_bytaBytes(2), 5, 1, 0, 0)
+                End Select
             End Get
             Set(value As OnOff)
-                BitWise.SetOnOffState(_bytaBytes(2), value)
+                Select Case Me.Type
+                    Case SwitchInputType.InputLevels
+                        'Byte(2)[0xILxxxx]; sets L (levels) bit
+                        CopyBits(value, 0, 1, _bytaBytes(2), 4)
+
+                    Case SwitchInputType.OutputLevels
+                        'Byte(2)[0xCTxxxx]
+                        'sets C (closed) bit to given value
+                        CopyBits(value, 0, 1, _bytaBytes(2), 5)
+                        'sets T (thrown) bit opposite of given value
+                        CopyBits(value Xor 1, 0, 1, _bytaBytes(2), 4)
+                End Select
             End Set
         End Property
 
@@ -4391,7 +4409,14 @@ Namespace Loconet
         ''' <seealso cref="PkSwitchInput.Description"/>
         Public Overrides ReadOnly Property ParmsDesc() As String
             Get
-                Return $"Adr={Me.Address} Switch={Me.Switch} State={Me.State} DS54(Adr={Me.DS54Address} Input={Me.DS54InputPair} Type={Me.DS54InputType})"
+                Select Case Me.Type
+                    Case SwitchInputType.InputLevels
+                        Return $"Type={Me.Type} Input={Me.DS54InputType} Adr={Me.Address} State={Me.State}"
+
+                    Case SwitchInputType.OutputLevels
+                        Return $"Type={Me.Type} Switch={Me.Switch} State={Me.State}"
+                End Select
+                'Return $"Adr={Me.Address} Switch={Me.Switch} State={Me.State} DS54(Adr={Me.DS54Address} Input={Me.DS54InputPair} Type={Me.DS54InputType})"
             End Get
         End Property
 
@@ -4887,7 +4912,7 @@ Namespace Loconet
         ''' <seealso cref="PkSecurityElem.Description"/>
         Public Overrides ReadOnly Property ParmsDesc() As String
             Get
-                Return "Adr=" & Me.Address
+                Return $"Adr={Me.Address}"
             End Get
         End Property
 
@@ -5874,9 +5899,9 @@ Namespace Loconet
             Get
                 Select Case Me.Type
                     Case LongAckType.SwitchStateResponse, LongAckType.PmOpsRead, LongAckType.BdOpsRead
-                        Return "Type=" & Me.Type.ToString & " State=" & Me.State.ToString
+                        Return $"Type={Me.Type} State={Me.State}"
                     Case Else
-                        Return "Type=" & Me.Type.ToString
+                        Return $"Type={Me.Type}"
                 End Select
             End Get
         End Property
